@@ -10,19 +10,19 @@ powershell -ExecutionPolicy Bypass -File scripts\build-portable.ps1 -Zip
 ```
 
 脚本会依次完成：构建前端 → 后端 jar（含前端静态资源）→ `jlink` 裁剪运行时 → 组装发布目录 → 打包 zip。
-产物：`release/医馆系统/` 与 `release/医馆系统-v0.1.0-便携版.zip`。
+产物：`release/方笺系统/` 与 `release/方笺系统-v0.1.0-便携版.zip`。
 
 > 构建前请先停止正在运行的实例，否则 jar 被占用会导致打包失败。
 
 ## 二、目录结构
 
 ```
-医馆系统\
-├─ 启动医馆系统.bat     双击启动，浏览器自动打开 http://127.0.0.1:8080
-├─ 停止医馆系统.bat     停止后台服务
-├─ 打开医馆系统.bat     仅打开浏览器
+方笺系统\
+├─ 启动方笺系统.bat     双击启动，浏览器自动打开 http://127.0.0.1:8080
+├─ 停止方笺系统.bat     停止后台服务
+├─ 打开方笺系统.bat     仅打开浏览器
 ├─ runtime\             jlink 裁剪的 Java 运行时（用户无需安装）
-├─ app\医馆系统.jar      后端 + 前端静态资源（单进程）
+├─ app\方笺系统.jar      后端 + 前端静态资源（单进程）
 ├─ config\              端口等配置（改完重启生效）
 ├─ data\                数据库（首次启动自动生成）
 ├─ backup\              每次启动自动整库备份，保留 7 份
@@ -32,8 +32,8 @@ powershell -ExecutionPolicy Bypass -File scripts\build-portable.ps1 -Zip
 
 ## 三、部署到医馆电脑
 
-1. 把 `release/医馆系统` 整个文件夹拷到目标电脑，建议放非系统盘（如 `D:\医馆系统`）。
-2. 双击「启动医馆系统.bat」，首次启动约 20-40 秒（建库 + 初始化）。
+1. 把 `release/方笺系统` 整个文件夹拷到目标电脑，建议放非系统盘（如 `D:\方笺系统`）。
+2. 双击「启动方笺系统.bat」，首次启动约 20-40 秒（建库 + 初始化）。
 3. 浏览器访问 `http://127.0.0.1:8080`，默认管理员 `admin / 123456`。
 4. **立即修改所有默认密码**（员工管理），并把 `config/application.properties` 中的端口/说明按需调整。
 
@@ -48,7 +48,7 @@ powershell -ExecutionPolicy Bypass -File scripts\build-portable.ps1 -Zip
 | 现象 | 处理 |
 | --- | --- |
 | 端口被占用 / 页面打不开 | 改 `config/application.properties` 的 `server.port`（如 8081），重启后访问新端口 |
-| 启动超时 | 看 `logs/yiguan-his.log` 最后几十行 |
+| 启动超时 | 看 `logs/fangjian-clinic.log` 最后几十行 |
 | 杀毒软件报警 | 未签名程序常见误报，确认来源后加入信任 |
 | 打印不出纸 | 先「另存为 PDF」确认内容，再检查打印机驱动与纸张设置 |
 | 局域网其他电脑访问 | 后端默认监听 0.0.0.0，放行防火墙端口后用本机 IP 访问 |

@@ -48,7 +48,7 @@ body:
     id: logs
     attributes:
       label: 相关日志
-      description: logs/yiguan-his.log 尾部内容（请先脱敏）
+      description: logs/fangjian-clinic.log 尾部内容（请先脱敏）
       render: text
   - type: input
     id: env

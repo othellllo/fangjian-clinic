@@ -8,7 +8,7 @@ const service = axios.create({
 })
 
 service.interceptors.request.use((config) => {
-  const token = localStorage.getItem('yiguan_token')
+  const token = localStorage.getItem('fangjian_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -26,8 +26,8 @@ service.interceptors.response.use(
       return body.data
     }
     if (body.code === 401) {
-      localStorage.removeItem('yiguan_token')
-      localStorage.removeItem('yiguan_user')
+      localStorage.removeItem('fangjian_token')
+      localStorage.removeItem('fangjian_user')
       router.replace('/login')
     }
     ElMessage.error(body.message || '请求失败')
@@ -36,8 +36,8 @@ service.interceptors.response.use(
   (error) => {
     const status = error.response?.status
     if (status === 401) {
-      localStorage.removeItem('yiguan_token')
-      localStorage.removeItem('yiguan_user')
+      localStorage.removeItem('fangjian_token')
+      localStorage.removeItem('fangjian_user')
       router.replace('/login')
       ElMessage.error('登录已失效，请重新登录')
     } else {

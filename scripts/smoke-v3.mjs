@@ -51,7 +51,7 @@ function assert(cond, msg) {
 }
 
 async function main() {
-  console.log(`\n== 医馆 HIS v3 冒烟测试 @ ${BASE} ==\n`)
+  console.log(`\n== 方笺 v3 冒烟测试 @ ${BASE} ==\n`)
 
   const login = await api('POST', '/auth/login', { username: 'admin', password: '123456' })
   token = login.token

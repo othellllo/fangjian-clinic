@@ -1,7 +1,7 @@
 // v5 页面检查：数据导入中心
 function outPath(name) {
   // 截图目录：设置环境变量 SHOT_DIR 为绝对路径（如 D:\shots），默认相对当前工作目录的 screenshots/
-  var dir = process.env.SHOT_DIR || 'screenshots';
+  var dir = (typeof SHOT_DIR !== 'undefined' && SHOT_DIR) ? SHOT_DIR : 'screenshots';
   return dir.replace(/[\\/]+$/, '') + '/' + name + '.png';
 }
 globalThis.uiErrors = [];

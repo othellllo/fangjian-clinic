@@ -6,7 +6,7 @@ server:
 spring:
   datasource:
     # 相对路径：以启动目录（绿色版根目录）为基准，整个文件夹可整体拷贝迁移
-    url: jdbc:h2:file:./data/yiguan;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:./data/fangjian;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password: ''
@@ -22,8 +22,8 @@ app:
 
 logging:
   level:
-    com.yiguan.his: INFO
+    com.fangjian.clinic: INFO
   charset:
     file: UTF-8
   file:
-    name: ./logs/yiguan-his.log
+    name: ./logs/fangjian-clinic.log

@@ -1,21 +1,21 @@
 ﻿param(
     [string]$DbHost = '127.0.0.1',
     [int]$DbPort = 3306,
-    [string]$Database = 'yiguan_his',
-    [string]$User = 'yiguan',
+    [string]$Database = 'fangjian_clinic',
+    [string]$User = 'fangjian',
     [string]$Password = $env:DB_PASSWORD,
     [string]$OutDir = '',
     [int]$KeepDays = 14,
-    [string]$Container = 'yiguan-mysql'
+    [string]$Container = 'fangjian-mysql'
 )
 
-# 医馆 HIS — MySQL 逻辑备份脚本
+# 方笺 — MySQL 逻辑备份脚本
 # 用法示例：
 #   powershell -File scripts\backup-mysql.ps1 -Password yourpass
 #   powershell -File scripts\backup-mysql.ps1 -DbHost 127.0.0.1 -OutDir D:\his-backup -KeepDays 30
 #
 # 说明：
-#   - 优先使用本机 mysqldump；没有则尝试 docker exec 到容器里执行（docker-compose 默认容器名 yiguan-mysql）。
+#   - 优先使用本机 mysqldump；没有则尝试 docker exec 到容器里执行（docker-compose 默认容器名 fangjian-mysql）。
 #   - 备份文件为 gzip 压缩的 SQL：<库名>-<yyyyMMdd-HHmmss>.sql.gz
 #   - 默认保留 14 天，可用 -KeepDays 调整。
 

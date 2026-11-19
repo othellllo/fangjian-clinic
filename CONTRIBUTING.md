@@ -1,6 +1,6 @@
 # 参与贡献（Contributing）
 
-感谢你愿意参与「医馆 HIS」。这是一个面向中医馆/小型诊所的开源门诊系统，欢迎代码、文档、规则库、翻译与问题反馈。
+感谢你愿意参与「方笺」。这是一个面向中医馆/小型诊所的开源门诊系统，欢迎代码、文档、规则库、翻译与问题反馈。
 
 ## 一、开发环境
 
@@ -28,7 +28,7 @@ node scripts/smoke.mjs
 ## 二、代码结构
 
 ```
-backend/src/main/java/com/yiguan/his/
+backend/src/main/java/com/fangjian/his/
 ├─ common/     统一响应、分页、异常、单号
 ├─ config/     安全、JWT、Jackson、审计过滤器、启动初始化
 ├─ domain/     实体与枚举

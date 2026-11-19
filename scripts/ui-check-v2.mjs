@@ -1,7 +1,7 @@
 // v2 页面检查：操作审计、代煎管理、挂号台「今日预约」tab
 function outPath(name) {
   // 截图目录：设置环境变量 SHOT_DIR 为绝对路径（如 D:\shots），默认相对当前工作目录的 screenshots/
-  var dir = process.env.SHOT_DIR || 'screenshots';
+  var dir = (typeof SHOT_DIR !== 'undefined' && SHOT_DIR) ? SHOT_DIR : 'screenshots';
   return dir.replace(/[\\/]+$/, '') + '/' + name + '.png';
 }
 
@@ -25,7 +25,7 @@ async function shot(name) {
   globalThis.uiShots.push(name);
 }
 
-await page.goto('http://127.0.0.1:5173/login', { waitUntil: 'domcontentloaded' });
+await page.goto(APP_URL + '/login', { waitUntil: 'domcontentloaded' });
 await page.evaluate(function () { localStorage.clear(); });
 await page.reload({ waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(1000);
@@ -37,19 +37,19 @@ await inputs.nth(1).press('Enter');
 await page.waitForTimeout(3000);
 
 // 挂号台 + 今日预约 tab
-await page.goto('http://127.0.0.1:5173/registration', { waitUntil: 'domcontentloaded' });
+await page.goto(APP_URL + '/registration', { waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(1500);
 await page.getByRole('tab').nth(2).click();
 await page.waitForTimeout(1500);
 await shot('09-registration-appointments');
 
 // 代煎管理
-await page.goto('http://127.0.0.1:5173/pharmacy/decoction', { waitUntil: 'domcontentloaded' });
+await page.goto(APP_URL + '/pharmacy/decoction', { waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(2000);
 await shot('10-decoction-manage');
 
 // 操作审计
-await page.goto('http://127.0.0.1:5173/system/audit', { waitUntil: 'domcontentloaded' });
+await page.goto(APP_URL + '/system/audit', { waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(2000);
 await shot('11-audit-log');
 

@@ -150,7 +150,7 @@ router.beforeEach((to) => {
 })
 
 router.afterEach((to) => {
-  document.title = to.meta.title ? `${to.meta.title} · 医馆 HIS` : '医馆 HIS'
+  document.title = to.meta.title ? `${to.meta.title} · 方笺` : '方笺'
 })
 
 export default router

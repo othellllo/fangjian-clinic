@@ -6,6 +6,19 @@
 
 首个可运行版本：门诊闭环 + 中医特色功能 + 本地化部署。
 
+### 变更 · 项目更名
+
+项目由「医馆 HIS」更名为 **方笺（Fangjian）**，一次性完成全仓标识替换：
+
+- 产品名与界面品牌：方笺 · 中医门诊系统
+- Java 包：`com.yiguan.his` → `com.fangjian.clinic`
+- Maven 坐标：`com.fangjian:fangjian-clinic`，jar 名 `fangjian-clinic-0.1.0.jar`
+- 数据库/数据目录：`fangjian_clinic` / `data/fangjian`
+- 备份、导出、容器、日志名称同步更新
+- 旧数据升级：把 `data/yiguan.*` 重命名为 `data/fangjian.*` 即可（未发布过，无存量用户）
+
+命名理由与备选名见 [docs/naming.md](docs/naming.md)。
+
 ### 新增 · 门诊业务
 
 - 患者档案：建档、检索、就诊历史、过敏史/既往史

@@ -1,5 +1,5 @@
 /**
- * 医馆 HIS —— 微信小程序患者端 全局配置
+ * 方笺 —— 微信小程序患者端 全局配置
  *
  * 联调时只需要改这里：
  *  - 开发者工具（本机后端）：http://localhost:8080/api
@@ -23,6 +23,6 @@ module.exports = {
   PAGE_SIZE: 10,
 
   // 应用信息（「我的 - 关于」展示）
-  APP_NAME: '医馆 HIS',
+  APP_NAME: '方笺',
   APP_VERSION: '1.0.0'
 }

@@ -6,7 +6,7 @@
           <div class="brand-logo">
             <el-icon :size="30"><FirstAidKit /></el-icon>
           </div>
-          <h1 class="brand-title">医馆 HIS</h1>
+          <h1 class="brand-title">方笺</h1>
           <p class="brand-sub">中医馆信息管理系统</p>
           <div class="brand-divider"></div>
           <ul class="brand-features">

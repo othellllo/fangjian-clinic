@@ -51,7 +51,7 @@ async function payVisit(visitId) {
 }
 
 async function main() {
-  console.log(`\n== 医馆 HIS v6 扫码发药冒烟 @ ${BASE} ==\n`)
+  console.log(`\n== 方笺 v6 扫码发药冒烟 @ ${BASE} ==\n`)
   const login = await api('POST', '/auth/login', { username: 'admin', password: '123456' })
   token = login.token
   step('登录', login.user.realName)

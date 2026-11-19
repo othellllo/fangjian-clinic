@@ -1,7 +1,7 @@
 # 下一步待办（2026-11-18 收工存档）
 
 当前版本：v0.1.0，功能到 v6（门诊闭环 / 代煎 / 小程序 / 审计 / 打印 / 追溯码 / 设置 / 导出 / 政策库 / 中西医病历+联想+质控+AI助写 / 用药安全 / Excel 迁移 / 扫码发药）。
-验证：六套端到端冒烟合计 91 项全过；便携包 `release\医馆系统`（141.5MB，zip 117.6MB）从零启动可跑通。
+验证：六套端到端冒烟合计 91 项全过；便携包 `release\方笺系统`（142.4MB，zip 118.4MB）从零启动可跑通。
 
 ## 一、需要用户提供信息才能推进（外部依赖）
 
@@ -37,7 +37,7 @@
 - 验证：干净克隆后 `mvn test` 与 `npm ci && npm run build` 均通过
 - 待办（需要用户账号）：
   1. 在 GitHub 建空仓库并 `git remote add origin ... && git push -u origin main`
-  2. 建 Release v0.1.0，把 `release/医馆系统-v0.1.0-便携版.zip`（约 117MB）作为附件上传
+  2. 建 Release v0.1.0，把 `release/方笺系统-v0.1.0-便携版.zip`（约 118MB）作为附件上传
      （注意：单文件提交上限 100MB，便携包不能进 git，只能走 Release 附件）
   3. 仓库设置：Description/Topics/Discussions/分支保护/Dependabot/Secret scanning
   4. 决定 open-core 边界（医保地区实现、托管运维是否闭源），见 docs/publishing.md

@@ -1,5 +1,5 @@
 {
-  "description": "医馆 HIS —— 微信小程序患者端（预约挂号 / 就诊记录 / 处方费用）",
+  "description": "方笺 —— 微信小程序患者端（预约挂号 / 就诊记录 / 处方费用）",
   "packOptions": {
     "ignore": [
       {
@@ -37,7 +37,7 @@
   "compileType": "miniprogram",
   "libVersion": "2.33.0",
   "appid": "touristappid",
-  "projectname": "yiguan-his-miniapp",
+  "projectname": "fangjian-clinic-miniapp",
   "miniprogramRoot": "./",
   "condition": {},
   "editorSetting": {

@@ -11,11 +11,11 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.yiguan</groupId>
-    <artifactId>yiguan-his</artifactId>
+    <groupId>com.fangjian</groupId>
+    <artifactId>fangjian-clinic</artifactId>
     <version>0.1.0</version>
-    <name>yiguan-his</name>
-    <description>开源医馆（中医馆）信息管理系统</description>
+    <name>fangjian-clinic</name>
+    <description>方笺 · 开源中医门诊系统</description>
 
     <properties>
         <java.version>21</java.version>

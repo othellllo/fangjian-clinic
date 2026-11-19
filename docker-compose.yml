@@ -3,13 +3,13 @@ version: '3.9'
 services:
   mysql:
     image: mysql:8.0
-    container_name: yiguan-mysql
+    container_name: fangjian-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123456}
-      MYSQL_DATABASE: yiguan_his
-      MYSQL_USER: yiguan
-      MYSQL_PASSWORD: ${DB_PASSWORD:-yiguan123}
+      MYSQL_DATABASE: fangjian_clinic
+      MYSQL_USER: fangjian
+      MYSQL_PASSWORD: ${DB_PASSWORD:-fangjian123}
       TZ: Asia/Shanghai
     command:
       - --character-set-server=utf8mb4
@@ -27,7 +27,7 @@ services:
 
   backend:
     build: ./backend
-    container_name: yiguan-backend
+    container_name: fangjian-backend
     restart: unless-stopped
     depends_on:
       mysql:
@@ -36,9 +36,9 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: yiguan_his
-      DB_USER: yiguan
-      DB_PASSWORD: ${DB_PASSWORD:-yiguan123}
+      DB_NAME: fangjian_clinic
+      DB_USER: fangjian
+      DB_PASSWORD: ${DB_PASSWORD:-fangjian123}
       JWT_SECRET: ${JWT_SECRET:-please-change-this-secret-in-production-0123456789}
       TZ: Asia/Shanghai
     ports:
@@ -46,7 +46,7 @@ services:
 
   frontend:
     build: ./frontend
-    container_name: yiguan-frontend
+    container_name: fangjian-frontend
     restart: unless-stopped
     depends_on:
       - backend

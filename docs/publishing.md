@@ -8,8 +8,8 @@
 在 GitHub 新建一个**空仓库**（不要勾选初始化 README/.gitignore/LICENSE），然后：
 
 ```bash
-cd J:\医馆系统
-git remote add origin https://github.com/<你的账号>/yiguan-his.git
+cd J:\方笺系统
+git remote add origin https://github.com/<你的账号>/fangjian-clinic.git
 git push -u origin main
 ```
 
@@ -41,7 +41,7 @@ git push origin v0.1.0
 ```
 
 3. 在 GitHub Releases 用 `v0.1.0` 创建 Release，标题与说明可直接用 `CHANGELOG.md` 对应段落。
-4. **便携版 zip 作为 Release 附件上传**（`release/医馆系统-v0.1.0-便携版.zip`，约 117MB）。
+4. **便携版 zip 作为 Release 附件上传**（`release/方笺系统-v0.1.0-便携版.zip`，约 117MB）。
 
 > 注意：GitHub 单文件提交上限 100MB，所以**便携包不要提交进 git**（`.gitignore` 已忽略 `release/`），
 > 只作为 Release 附件分发（Release 附件上限 2GB）。
@@ -74,7 +74,7 @@ git push origin v0.1.0
 
 另外注意：
 - **不要宣称诊断能力**。门诊信息系统通常不属于医疗器械软件，但一旦宣传"AI 诊断/辅助诊断"可能触发监管要求。
-- "医馆 HIS"作为项目名建议查一下商标；如果商用，注册软件著作权并保留提交记录作为证据。
+- "方笺"作为项目名建议查一下商标；如果商用，注册软件著作权并保留提交记录作为证据。
 - 默认账号密码与 JWT 密钥必须在文档里反复强调替换，避免用户直接上生产。
 
 ## 七、持续维护

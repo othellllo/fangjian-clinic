@@ -21,7 +21,7 @@ node scripts\smoke.mjs
 
 # 3. 生产备份 / 恢复
 powershell -File scripts\backup-mysql.ps1 -Password '库密码' -OutDir D:\his-backup -KeepDays 30
-powershell -File scripts\restore-mysql.ps1 -File D:\his-backup\yiguan_his-20261118-020000.sql.gz -Password '库密码'
+powershell -File scripts\restore-mysql.ps1 -File D:\his-backup\fangjian_clinic-20261118-020000.sql.gz -Password '库密码'
 
 # 4. UI 截图检查（需要 Tabbit 浏览器 CLI）
 # 用法见 ui-check.mjs 头部注释

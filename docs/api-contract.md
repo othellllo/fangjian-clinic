@@ -1,4 +1,4 @@
-# 医馆 HIS — 接口契约（前后端唯一事实来源）
+# 方笺 — 接口契约（前后端唯一事实来源）
 
 基准：`http://localhost:8080/api`　开发期前端走 Vite 代理 `/api` → `http://localhost:8080`。
 

@@ -1,4 +1,4 @@
-# 医馆 HIS · 开源中医馆信息管理系统
+# 方笺 · 开源中医馆信息管理系统
 
 面向**中医馆 / 医馆 / 小型诊所**的开源信息管理系统，覆盖「挂号 → 候诊 → 接诊 → 开方 → 收费 → 发药 → 报表」的完整门诊闭环，并按中医业务特点设计病历（四诊、辨证、治则）与饮片库存（批号、效期、先进先出）。
 
@@ -69,15 +69,15 @@
 powershell -ExecutionPolicy Bypass -File scripts\build-portable.ps1 -Zip
 ```
 
-产物：`release\医馆系统\`（约 120MB，jar 内已含前端）与同名 zip：
+产物：`release\方笺系统\`（约 120MB，jar 内已含前端）与同名 zip：
 
 ```
-医馆系统\
-├─ 启动医馆系统.bat     双击启动，浏览器自动打开 http://127.0.0.1:8080
-├─ 停止医馆系统.bat     停止后台服务
-├─ 打开医馆系统.bat     仅打开浏览器
+方笺系统\
+├─ 启动方笺系统.bat     双击启动，浏览器自动打开 http://127.0.0.1:8080
+├─ 停止方笺系统.bat     停止后台服务
+├─ 打开方笺系统.bat     仅打开浏览器
 ├─ runtime\             jlink 裁剪的 Java 运行时（用户无需安装）
-├─ app\医馆系统.jar      后端 + 前端静态资源
+├─ app\方笺系统.jar      后端 + 前端静态资源
 ├─ config\              端口等配置（改完重启生效）
 ├─ data\                数据库（首次启动自动生成）
 ├─ backup\              每次启动自动整库备份，保留 7 份
@@ -136,12 +136,12 @@ npm run dev
 
 ```bash
 # 建库
-mysql -uroot -p -e "CREATE DATABASE yiguan_his DEFAULT CHARSET utf8mb4;"
+mysql -uroot -p -e "CREATE DATABASE fangjian_clinic DEFAULT CHARSET utf8mb4;"
 
 # 启动（Flyway 自动建表）
-java -jar backend/target/yiguan-his-0.1.0.jar \
+java -jar backend/target/fangjian-clinic-0.1.0.jar \
   --spring.profiles.active=prod \
-  --DB_HOST=127.0.0.1 --DB_USER=yiguan --DB_PASSWORD=yourpassword \
+  --DB_HOST=127.0.0.1 --DB_USER=fangjian --DB_PASSWORD=yourpassword \
   --JWT_SECRET=请替换为足够长的随机字符串
 ```
 
@@ -177,15 +177,15 @@ java -jar backend/target/yiguan-his-0.1.0.jar \
 # 每日备份（保留 30 天）
 powershell -File scripts\backup-mysql.ps1 -Password '库密码' -OutDir D:\his-backup -KeepDays 30
 # 恢复
-powershell -File scripts\restore-mysql.ps1 -File D:\his-backup\yiguan_his-20261118-020000.sql.gz -Password '库密码'
+powershell -File scripts\restore-mysql.ps1 -File D:\his-backup\fangjian_clinic-20261118-020000.sql.gz -Password '库密码'
 ```
 
 ## 目录结构
 
 ```
-yiguan-his/
+fangjian-clinic/
 ├─ backend/                     Spring Boot 单体（按领域分包，不拆微服务）
-│  └─ src/main/java/com/yiguan/his/
+│  └─ src/main/java/com/fangjian/his/
 │     ├─ common/                统一响应、分页、异常、单号生成
 │     ├─ config/                安全配置、JWT、Jackson、审计过滤器、启动初始化
 │     ├─ domain/                实体与枚举
@@ -270,6 +270,9 @@ yiguan-his/
 | 文档 | 内容 |
 | --- | --- |
 | [docs/api-contract.md](docs/api-contract.md) | 前后端接口契约（v1~v6 全部接口） |
+| [docs/naming.md](docs/naming.md) | 项目命名理由、标识对照表与商标提醒 |
+| [docs/open-core.md](docs/open-core.md) | 开源版与商业版分层方案（open-core） |
+| [docs/publishing.md](docs/publishing.md) | 推 GitHub、发 Release、仓库设置 |
 | [docs/design.md](docs/design.md) | 领域模型、业务规则与设计取舍 |
 | [docs/clinical-design.md](docs/clinical-design.md) | 病历书写规范依据、质控规则、用药安全规则、AI 方案 |
 | [docs/policy-brief.md](docs/policy-brief.md) | 医保政策与追溯码合规调研（含官方链接） |

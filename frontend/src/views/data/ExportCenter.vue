@@ -45,7 +45,7 @@
       </div>
 
       <div class="export-foot text-muted">
-        导出文件命名规则：医馆系统-类型-日期.csv。若提示无数据，说明所选范围内暂无可导出记录。
+        导出文件命名规则：方笺系统-类型-日期.csv。若提示无数据，说明所选范围内暂无可导出记录。
       </div>
     </div>
   </div>
@@ -109,7 +109,7 @@ const exporting = reactive({})
 
 function buildFileName(item, range) {
   const date = range && range[0] && range[1] ? `${range[0]}_${range[1]}` : todayStr()
-  return `医馆系统-${item.name}-${date}.csv`
+  return `方笺系统-${item.name}-${date}.csv`
 }
 
 function saveBlob(blob, fileName) {

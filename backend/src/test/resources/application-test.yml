@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:yiguan_test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:fangjian_test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password: ''
@@ -13,9 +13,9 @@ spring:
 
 app:
   jwt:
-    secret: test-secret-key-for-yiguan-his-unit-test-0123456789
+    secret: test-secret-key-for-fangjian-clinic-unit-test-0123456789
     expire-minutes: 60
 
 logging:
   level:
-    com.yiguan.his: WARN
+    com.fangjian.clinic: WARN

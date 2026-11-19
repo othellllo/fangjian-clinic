@@ -3,7 +3,7 @@
     <el-aside width="200px" class="aside">
       <div class="logo">
         <el-icon><OfficeBuilding /></el-icon>
-        <span>医馆 HIS</span>
+        <span>方笺</span>
       </div>
       <el-menu :default-active="activeMenu" router class="menu" background-color="#1f2d3d" text-color="#c0c4cc"
         active-text-color="#ffd04b">

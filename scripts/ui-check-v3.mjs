@@ -1,7 +1,7 @@
 // v3 页面检查：追溯码、系统设置、医保政策、数据导出
 function outPath(name) {
   // 截图目录：设置环境变量 SHOT_DIR 为绝对路径（如 D:\shots），默认相对当前工作目录的 screenshots/
-  var dir = process.env.SHOT_DIR || 'screenshots';
+  var dir = (typeof SHOT_DIR !== 'undefined' && SHOT_DIR) ? SHOT_DIR : 'screenshots';
   return dir.replace(/[\\/]+$/, '') + '/' + name + '.png';
 }
 
@@ -24,7 +24,7 @@ async function shot(name) {
   globalThis.uiShots.push(name);
 }
 
-await page.goto('http://127.0.0.1:5173/login', { waitUntil: 'domcontentloaded' });
+await page.goto(APP_URL + '/login', { waitUntil: 'domcontentloaded' });
 await page.evaluate(function () { localStorage.clear(); });
 await page.reload({ waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(1000);
@@ -43,7 +43,7 @@ var targets = [
   ['reports', '16-insurance-report']
 ];
 for (var i = 0; i < targets.length; i++) {
-  await page.goto('http://127.0.0.1:5173/' + targets[i][0], { waitUntil: 'domcontentloaded' });
+  await page.goto(APP_URL + '/' + targets[i][0], { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(2000);
   await shot(targets[i][1]);
 }

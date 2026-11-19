@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 医馆 HIS 端到端冒烟测试
+ * 方笺 端到端冒烟测试
  *
  * v1 闭环：登录 → 建档 → 挂号 → 接诊 → 病历 → 开方 → 收费 → 发药 → 完成就诊 → 报表
  * v2 新增：代煎流转 → 会员储值 → 微信小程序预约（患者端 token）→ 到店报到 → 操作审计
@@ -59,7 +59,7 @@ function dayString(offsetDays) {
 }
 
 async function main() {
-  console.log(`\n== 医馆 HIS 冒烟测试 @ ${BASE} ==\n`)
+  console.log(`\n== 方笺 冒烟测试 @ ${BASE} ==\n`)
 
   // 1. 登录
   const login = await api('POST', '/auth/login', ACCOUNT)

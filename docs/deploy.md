@@ -1,4 +1,4 @@
-# 医馆 HIS — MySQL 生产部署与运维手册
+# 方笺 — MySQL 生产部署与运维手册
 
 适用于「每家医馆部署一套」的单机私有化形态。数据库用 MySQL 8，应用为单个 jar，
 前端为静态文件（Nginx 托管）。全流程不依赖外网。
@@ -17,9 +17,9 @@
 
 ```sql
 -- 以 root 执行
-CREATE DATABASE yiguan_his DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'yiguan'@'localhost' IDENTIFIED BY '换成强密码';
-GRANT ALL PRIVILEGES ON yiguan_his.* TO 'yiguan'@'localhost';
+CREATE DATABASE fangjian_clinic DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'fangjian'@'localhost' IDENTIFIED BY '换成强密码';
+GRANT ALL PRIVILEGES ON fangjian_clinic.* TO 'fangjian'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
@@ -34,7 +34,7 @@ FLUSH PRIVILEGES;
 # 1. 构建（开发机执行，产物只有一个 jar）
 cd backend && mvn clean package -DskipTests
 # 2. 上传
-scp target/yiguan-his-0.1.0.jar user@server:/opt/yiguan-his/app.jar
+scp target/fangjian-clinic-0.1.0.jar user@server:/opt/fangjian-clinic/app.jar
 ```
 
 启动参数（环境变量方式，避免密码写进命令行历史）：
@@ -43,27 +43,27 @@ scp target/yiguan-his-0.1.0.jar user@server:/opt/yiguan-his/app.jar
 export SPRING_PROFILES_ACTIVE=prod
 export DB_HOST=127.0.0.1
 export DB_PORT=3306
-export DB_NAME=yiguan_his
-export DB_USER=yiguan
+export DB_NAME=fangjian_clinic
+export DB_USER=fangjian
 export DB_PASSWORD='换成强密码'
 export JWT_SECRET='至少 32 位随机字符串，务必替换默认值'
-java -Xms512m -Xmx1024m -jar /opt/yiguan-his/app.jar
+java -Xms512m -Xmx1024m -jar /opt/fangjian-clinic/app.jar
 ```
 
 ### systemd 托管（Linux 推荐）
 
-`/etc/systemd/system/yiguan-his.service`：
+`/etc/systemd/system/fangjian-clinic.service`：
 
 ```ini
 [Unit]
-Description=Yiguan HIS backend
+Description=Fangjian HIS backend
 After=network.target mysql.service
 
 [Service]
-User=yiguan
-WorkingDirectory=/opt/yiguan-his
-EnvironmentFile=/opt/yiguan-his/his.env
-ExecStart=/usr/bin/java -Xms512m -Xmx1024m -jar /opt/yiguan-his/app.jar
+User=fangjian
+WorkingDirectory=/opt/fangjian-clinic
+EnvironmentFile=/opt/fangjian-clinic/his.env
+ExecStart=/usr/bin/java -Xms512m -Xmx1024m -jar /opt/fangjian-clinic/app.jar
 Restart=always
 RestartSec=5
 LimitNOFILE=65536
@@ -72,21 +72,21 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 ```
 
-`/opt/yiguan-his/his.env`（权限 `600`）：
+`/opt/fangjian-clinic/his.env`（权限 `600`）：
 
 ```ini
 SPRING_PROFILES_ACTIVE=prod
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_NAME=yiguan_his
-DB_USER=yiguan
+DB_NAME=fangjian_clinic
+DB_USER=fangjian
 DB_PASSWORD=换成强密码
 JWT_SECRET=至少32位随机字符串
 ```
 
 ```bash
-systemctl daemon-reload && systemctl enable --now yiguan-his
-systemctl status yiguan-his
+systemctl daemon-reload && systemctl enable --now fangjian-clinic
+systemctl status fangjian-clinic
 curl -s http://127.0.0.1:8080/api/insurance/providers   # 健康检查
 ```
 
@@ -94,17 +94,17 @@ curl -s http://127.0.0.1:8080/api/insurance/providers   # 健康检查
 
 ```bash
 cd frontend && npm ci && npm run build
-scp -r dist/* user@server:/var/www/yiguan-his/
+scp -r dist/* user@server:/var/www/fangjian-clinic/
 ```
 
-`/etc/nginx/conf.d/yiguan-his.conf`：
+`/etc/nginx/conf.d/fangjian-clinic.conf`：
 
 ```nginx
 server {
     listen 80;
     server_name his.example.com;   # 医馆内网可写 IP
 
-    root /var/www/yiguan-his;
+    root /var/www/fangjian-clinic;
     index index.html;
 
     location / { try_files $uri $uri/ /index.html; }
@@ -144,7 +144,7 @@ docker compose logs -f backend
 
 ## 六、备份与恢复
 
-**备份是医馆系统的生命线**：病历与收费数据丢失无法重建。
+**备份是方笺系统的生命线**：病历与收费数据丢失无法重建。
 
 ```powershell
 # Windows 服务器 / 运维机
@@ -153,16 +153,16 @@ powershell -File scripts\backup-mysql.ps1 -Password '库密码' -OutDir D:\his-b
 
 ```bash
 # Linux 服务器（每日 02:00 备份）
-0 2 * * * mysqldump -uyiguan -p'密码' --single-transaction --routines --events yiguan_his \
-  | gzip > /backup/yiguan_his-$(date +\%Y\%m\%d).sql.gz
+0 2 * * * mysqldump -ufangjian -p'密码' --single-transaction --routines --events fangjian_clinic \
+  | gzip > /backup/fangjian_clinic-$(date +\%Y\%m\%d).sql.gz
 # 清理 30 天前
-5 2 * * * find /backup -name 'yiguan_his-*.sql.gz' -mtime +30 -delete
+5 2 * * * find /backup -name 'fangjian_clinic-*.sql.gz' -mtime +30 -delete
 ```
 
 恢复：
 
 ```powershell
-powershell -File scripts\restore-mysql.ps1 -File D:\his-backup\yiguan_his-20261118-020000.sql.gz -Password '库密码'
+powershell -File scripts\restore-mysql.ps1 -File D:\his-backup\fangjian_clinic-20261118-020000.sql.gz -Password '库密码'
 ```
 
 建议再按周把备份拷到 **另一台机器或移动硬盘**，本地备份随机器一起坏的情况很常见。
@@ -182,7 +182,7 @@ powershell -File scripts\restore-mysql.ps1 -File D:\his-backup\yiguan_his-202611
 | 现象 | 排查方向 |
 | --- | --- |
 | 启动报 Flyway 校验失败 | 迁移脚本被改动过；生产库不要手改表结构，恢复备份后重新升级 |
-| 页面 502 | 后端没起来，看 `journalctl -u yiguan-his -n 200` |
+| 页面 502 | 后端没起来，看 `journalctl -u fangjian-clinic -n 200` |
 | 登录后立刻 401 | `JWT_SECRET` 变更导致旧 token 失效，重新登录即可 |
 | 时间差 8 小时 | MySQL 时区需为 `+08:00`，JVM 加 `-Duser.timezone=Asia/Shanghai` |
 | 库存扣减为负 | 检查是否有人手工改过 `drug_batch`，库存以批次结存为准 |

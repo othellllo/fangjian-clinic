@@ -502,7 +502,7 @@ async function onDownloadTemplate(item) {
       return
     }
     if (await rejectJsonBlob(blob)) return
-    saveBlob(blob, `医馆系统-${item.name}导入模板.xlsx`)
+    saveBlob(blob, `方笺系统-${item.name}导入模板.xlsx`)
     ElMessage.success(`${item.name}导入模板已开始下载`)
   } catch {
     /* 错误提示由 request 拦截器统一处理 */

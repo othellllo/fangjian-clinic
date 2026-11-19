@@ -11,7 +11,7 @@ import { join } from 'node:path'
 const BASE = process.env.BASE_URL || 'http://localhost:8080/api'
 let token = ''
 const results = []
-const tmp = mkdtempSync(join(tmpdir(), 'yiguan-import-'))
+const tmp = mkdtempSync(join(tmpdir(), 'fangjian-import-'))
 
 async function api(method, path, body) {
   const headers = { 'Content-Type': 'application/json; charset=utf-8' }
@@ -55,7 +55,7 @@ async function upload(path, type, file, mode) {
 }
 
 async function main() {
-  console.log(`\n== 医馆 HIS v5 数据导入冒烟 @ ${BASE} ==\n`)
+  console.log(`\n== 方笺 v5 数据导入冒烟 @ ${BASE} ==\n`)
   const login = await api('POST', '/auth/login', { username: 'admin', password: '123456' })
   token = login.token
   step('登录', login.user.realName)

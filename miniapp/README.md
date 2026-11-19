@@ -1,4 +1,4 @@
-# 医馆 HIS —— 微信小程序患者端
+# 方笺 —— 微信小程序患者端
 
 原生微信小程序（WXML / WXSS / JS），覆盖患者从**登录 → 预约挂号 → 我的预约 → 就诊记录 → 就诊详情（病历 / 处方 / 费用）**的完整闭环。不依赖 Taro / uni-app，不引入任何 npm 依赖。
 
@@ -11,14 +11,14 @@
 ### 1. 导入微信开发者工具
 
 1. 打开**微信开发者工具**，选择「导入项目」。
-2. 目录选择本文件夹：`yiguan-his/miniapp`。
+2. 目录选择本文件夹：`fangjian-clinic/miniapp`。
 3. AppID 选择「**游客模式**」或直接使用工程内已配置的 `touristappid`（无需真实 AppID）。
 4. 点击导入即可编译预览；`project.config.json` 中已设置 `urlCheck: false`，本地 `http://localhost` 不会报域名校验错误。
 
 ### 2. 启动后端
 
 ```bash
-cd yiguan-his/backend
+cd fangjian-clinic/backend
 mvn spring-boot:run
 ```
 

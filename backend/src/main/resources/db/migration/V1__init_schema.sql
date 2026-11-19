@@ -1,4 +1,4 @@
--- 医馆 HIS 初始表结构
+-- 方笺 初始表结构
 -- 说明：DDL 同时兼容 MySQL 8（生产）与 H2 的 MySQL 模式（开发/演示），
 -- 因此不使用 ENGINE、COMMENT、ON UPDATE CURRENT_TIMESTAMP 等方言特性。
 

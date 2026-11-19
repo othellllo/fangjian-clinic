@@ -2,16 +2,16 @@
     [Parameter(Mandatory = $true)][string]$File,
     [string]$DbHost = '127.0.0.1',
     [int]$DbPort = 3306,
-    [string]$Database = 'yiguan_his',
-    [string]$User = 'yiguan',
+    [string]$Database = 'fangjian_clinic',
+    [string]$User = 'fangjian',
     [string]$Password = $env:DB_PASSWORD,
-    [string]$Container = 'yiguan-mysql',
+    [string]$Container = 'fangjian-mysql',
     [switch]$Force
 )
 
-# 医馆 HIS — MySQL 恢复脚本
+# 方笺 — MySQL 恢复脚本
 # 用法：
-#   powershell -File scripts\restore-mysql.ps1 -File backups\yiguan_his-20261118-213000.sql.gz -Password yourpass
+#   powershell -File scripts\restore-mysql.ps1 -File backups\fangjian_clinic-20261118-213000.sql.gz -Password yourpass
 #
 # 注意：恢复会覆盖同名库中的现有数据，默认需要交互确认，-Force 可跳过。
 

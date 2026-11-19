@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: yiguan-his
+    name: fangjian-clinic
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   jackson:
@@ -27,13 +27,13 @@ spring:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:yiguan-his-dev-secret-key-please-change-in-production-0123456789}
+    secret: ${JWT_SECRET:fangjian-clinic-dev-secret-key-please-change-in-production-0123456789}
     expire-minutes: ${JWT_EXPIRE_MINUTES:720}
   patient:
     # 患者端（微信小程序）验证码：开发环境固定，接入短信服务商后改为真实校验
     login-code: ${PATIENT_LOGIN_CODE:123456}
   clinic:
-    default-name: 青囊中医馆
+    default-name: 示范中医馆
 
 springdoc:
   api-docs:
@@ -43,4 +43,4 @@ springdoc:
 
 logging:
   level:
-    com.yiguan.his: INFO
+    com.fangjian.clinic: INFO

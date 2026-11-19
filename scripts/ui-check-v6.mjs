@@ -1,7 +1,7 @@
 // v6 页面检查：药房发药扫码（先通过 API 造一张待发药处方）
 function outPath(name) {
   // 截图目录：设置环境变量 SHOT_DIR 为绝对路径（如 D:\shots），默认相对当前工作目录的 screenshots/
-  var dir = process.env.SHOT_DIR || 'screenshots';
+  var dir = (typeof SHOT_DIR !== 'undefined' && SHOT_DIR) ? SHOT_DIR : 'screenshots';
   return dir.replace(/[\\/]+$/, '') + '/' + name + '.png';
 }
 globalThis.uiErrors = [];
@@ -33,7 +33,7 @@ await inputs.nth(1).press('Enter');
 await page.waitForTimeout(3000);
 
 // 用页面内 fetch（带 token）造一张待发药处方：患者→挂号→接诊→开方→收费
-var token = await page.evaluate(function () { return localStorage.getItem('yiguan_token'); });
+var token = await page.evaluate(function () { return localStorage.getItem('fangjian_token'); });
 var created = await page.evaluate(async function (t) {
   async function api(method, path, body) {
     const res = await fetch('/api' + path, {
