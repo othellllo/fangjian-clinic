@@ -1,0 +1,40 @@
+<view class="page mine-page">
+  <view class="profile-card">
+    <view class="avatar">{{patient ? patient.initial : '患'}}</view>
+    <view class="profile-main">
+      <view class="profile-name">{{patient ? patient.name : '患者'}}</view>
+      <view class="profile-phone">{{patient && patient.phone ? patient.phone : '未绑定手机号'}}</view>
+      <view class="profile-no">病历号 {{patient && patient.patientNo ? patient.patientNo : '--'}}</view>
+    </view>
+  </view>
+
+  <view class="card balance-card">
+    <view class="balance-left">
+      <view class="balance-label">会员余额</view>
+      <view class="balance-value">{{patient ? patient.balanceText : '--'}}</view>
+    </view>
+    <view class="balance-tip">{{patient ? patient.balanceTip : '登录后查看会员余额'}}</view>
+  </view>
+
+  <view class="card menu-card">
+    <view class="menu-item" hover-class="menu-hover" bindtap="goVisits">
+      <view class="menu-icon icon-green">诊</view>
+      <view class="menu-text">我的就诊记录</view>
+      <text class="arrow menu-arrow">›</text>
+    </view>
+    <view class="menu-item" hover-class="menu-hover" bindtap="goAbout">
+      <view class="menu-icon icon-blue">i</view>
+      <view class="menu-text">关于</view>
+      <text class="arrow menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="card menu-card">
+    <view class="menu-item" hover-class="menu-hover" bindtap="onLogout">
+      <view class="menu-icon icon-red">退</view>
+      <view class="menu-text menu-danger">退出登录</view>
+    </view>
+  </view>
+
+  <view class="mine-footer">{{appName}} · 患者端 v{{version}}</view>
+</view>

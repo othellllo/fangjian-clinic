@@ -1,0 +1,57 @@
+name: Bug 报告
+description: 报告一个问题（请勿包含真实患者信息）
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。提交前请确认：
+        - 已在 [README](../blob/main/README.md) 与 [常见问题](../blob/main/docs/deploy.md) 中查找过
+        - **不要粘贴真实患者姓名、手机号、身份证号或病历内容**
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 现象描述
+      description: 发生了什么，期望是什么
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 登录后进入……
+        2. 点击……
+        3. 页面出现……
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: 便携版 / jar 版本号，或 commit 哈希
+    validations:
+      required: true
+  - type: dropdown
+    id: deploy
+    attributes:
+      label: 部署方式
+      options:
+        - 绿色便携版（H2）
+        - jar + MySQL
+        - Docker Compose
+        - 源码开发模式
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志
+      description: logs/yiguan-his.log 尾部内容（请先脱敏）
+      render: text
+  - type: input
+    id: env
+    attributes:
+      label: 环境
+      description: 操作系统、JDK/Node 版本、浏览器

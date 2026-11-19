@@ -1,0 +1,126 @@
+<view class="page index-page">
+  <view class="hero">
+    <view class="hero-title">预约挂号</view>
+    <view class="hero-sub">选择医生、日期与时段，到店直接候诊</view>
+  </view>
+
+  <!-- 1. 医生 -->
+  <view class="section">
+    <view class="section-head">
+      <text class="section-title">1. 选择医生</text>
+      <text class="section-extra" wx:if="{{doctors.length}}">共 {{doctors.length}} 位</text>
+    </view>
+
+    <view wx:if="{{loadingDoctors && !doctors.length}}" class="loading-tip">正在加载医生列表…</view>
+    <view wx:elif="{{doctorsError && !doctors.length}}" class="hint-card" bindtap="onRetryDoctors">医生列表加载失败，点击重试</view>
+    <view wx:elif="{{!doctors.length}}" class="empty card">
+      <view class="empty-icon">医</view>
+      <view class="empty-text">暂无可预约医生</view>
+      <view class="empty-sub">医生排班会陆续开放，请稍后再来</view>
+    </view>
+    <view wx:else>
+      <view
+        wx:for="{{doctors}}"
+        wx:key="id"
+        class="doctor-card {{item.selected ? 'doctor-selected' : ''}}"
+        hover-class="doctor-hover"
+        data-id="{{item.id}}"
+        bindtap="onSelectDoctor"
+      >
+        <view class="doctor-avatar">{{item.initial}}</view>
+        <view class="doctor-main">
+          <view class="doctor-name-row">
+            <text class="doctor-name">{{item.name}}</text>
+            <text class="doctor-title" wx:if="{{item.title}}">{{item.title}}</text>
+          </view>
+          <view class="doctor-dept">{{item.dept || '中医科'}}</view>
+          <view class="doctor-intro" wx:if="{{item.intro}}">{{item.intro}}</view>
+        </view>
+        <view class="radio {{item.selected ? 'radio-on' : ''}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 2. 日期 -->
+  <view class="section">
+    <view class="section-head">
+      <text class="section-title">2. 选择日期</text>
+      <text class="section-extra">可约今天起 7 天</text>
+    </view>
+    <scroll-view class="date-scroll" scroll-x="true">
+      <view class="date-row">
+        <view
+          wx:for="{{dates}}"
+          wx:key="value"
+          class="date-item {{item.active ? 'date-active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="onSelectDate"
+        >
+          <text class="date-week">{{item.week}}</text>
+          <text class="date-day">{{item.day}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 3. 时段 -->
+  <view class="section">
+    <view class="section-head">
+      <text class="section-title">3. 选择时段</text>
+      <text class="section-extra">{{selectedDateText}}</text>
+    </view>
+
+    <view wx:if="{{!selectedDoctorId}}" class="hint-card">请先在上方选择医生</view>
+    <view wx:elif="{{loadingSlots}}" class="loading-tip">正在加载可约时段…</view>
+    <view wx:elif="{{slotsError}}" class="hint-card" bindtap="onRetrySlots">时段加载失败，点击重试</view>
+    <view wx:elif="{{!slots.length}}" class="hint-card">当日暂无可约时段，换一天试试</view>
+    <view wx:else class="slot-list">
+      <view
+        wx:for="{{slots}}"
+        wx:key="key"
+        class="slot-item {{item.full ? 'slot-full' : ''}} {{item.selected ? 'slot-selected' : ''}}"
+        data-slot="{{item.timeSlot}}"
+        bindtap="onSelectSlot"
+      >
+        <text class="slot-time">{{item.timeSlot}}</text>
+        <text class="slot-meta">{{item.metaText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 4. 主诉 -->
+  <view class="section">
+    <view class="section-head">
+      <text class="section-title">4. 主诉</text>
+      <text class="section-extra">选填</text>
+    </view>
+    <view class="textarea-box">
+      <textarea
+        class="textarea"
+        maxlength="200"
+        value="{{complaint}}"
+        placeholder="简单描述症状，如：胃脘胀痛 3 天"
+        placeholder-style="color:#b4bdb9"
+        bindinput="onComplaintInput"
+      ></textarea>
+      <view class="counter">{{complaint.length}}/200</view>
+    </view>
+  </view>
+
+  <view class="submit-placeholder"></view>
+
+  <view class="submit-bar">
+    <view class="submit-summary">
+      <view class="summary-main">{{summaryText}}</view>
+      <view class="summary-sub">{{summarySub}}</view>
+    </view>
+    <view
+      class="btn-primary submit-btn {{(!selectedDoctorId || !selectedSlot || submitting) ? 'btn-disabled' : ''}}"
+      hover-class="btn-hover"
+      bindtap="onSubmit"
+    >
+      <text wx:if="{{submitting}}">提交中…</text>
+      <text wx:else>提交预约</text>
+    </view>
+  </view>
+</view>

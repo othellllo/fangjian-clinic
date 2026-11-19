@@ -1,0 +1,52 @@
+<view class="page visits-page">
+  <view class="hero">
+    <view class="hero-title">我的就诊记录</view>
+    <view class="hero-sub" wx:if="{{loaded}}">共 {{total}} 次就诊记录</view>
+    <view class="hero-sub" wx:else>病历 · 处方 · 费用</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-tip">正在加载就诊记录…</view>
+
+  <view wx:elif="{{error}}" class="hint-card gap-top" bindtap="onRetry">就诊记录加载失败，点击重试</view>
+
+  <view wx:elif="{{loaded && !visits.length}}" class="empty">
+    <view class="empty-icon">诊</view>
+    <view class="empty-text">还没有就诊记录</view>
+    <view class="empty-sub">完成一次就诊后，病历、处方与费用会出现在这里</view>
+    <view class="btn-primary empty-btn" hover-class="btn-hover" bindtap="goBooking">去预约</view>
+  </view>
+
+  <block wx:else>
+    <view
+      wx:for="{{visits}}"
+      wx:key="id"
+      class="card visit-card"
+      hover-class="visit-hover"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="visit-head">
+        <view class="visit-head-left">
+          <text class="visit-date">{{item.dateText}}</text>
+          <text class="visit-doctor">{{item.doctorName || '医生'}}</text>
+        </view>
+        <text class="tag {{item.statusClass}}">{{item.statusText}}</text>
+      </view>
+
+      <view class="visit-meta" wx:if="{{item.complaint}}">主诉：{{item.complaint}}</view>
+
+      <view class="visit-foot">
+        <text class="visit-no" wx:if="{{item.visitNo}}">就诊号 {{item.visitNo}}</text>
+        <text class="visit-type" wx:if="{{item.typeText}}">{{item.typeText}}</text>
+      </view>
+
+      <text class="arrow visit-arrow">›</text>
+    </view>
+
+    <view class="list-footer">
+      <text wx:if="{{loadingMore}}">正在加载…</text>
+      <text wx:elif="{{!hasMore}}">没有更多了</text>
+      <text wx:else>上拉加载更多</text>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,214 @@
+/**
+ * 全局样式 —— 微信原生风格，主色 #2f7d5d（中医馆气质）
+ * 约定：1px 视觉 ≈ 2rpx；卡片圆角 8px = 16rpx
+ */
+page {
+  background-color: #f5f7f6;
+  color: #1f2d27;
+  font-size: 28rpx;
+  line-height: 1.5;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+view,
+text,
+image,
+input,
+textarea,
+button,
+scroll-view {
+  box-sizing: border-box;
+}
+
+/* ---------- 页面骨架 ---------- */
+.page {
+  min-height: 100vh;
+  padding: 24rpx 24rpx calc(48rpx + env(safe-area-inset-bottom));
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(31, 45, 39, 0.05);
+}
+
+.section {
+  margin-top: 28rpx;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8rpx 16rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2d27;
+}
+
+.section-extra {
+  font-size: 24rpx;
+  color: #8a9490;
+}
+
+.loading-tip {
+  padding: 36rpx 0;
+  text-align: center;
+  font-size: 24rpx;
+  color: #9aa5a0;
+}
+
+.hint-card {
+  padding: 36rpx 24rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #9aa5a0;
+}
+
+/* ---------- 状态标签 ---------- */
+.tag {
+  display: inline-block;
+  padding: 2rpx 14rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  line-height: 34rpx;
+  white-space: nowrap;
+}
+
+.tag-blue {
+  color: #1f6fb2;
+  background-color: #e8f2fb;
+}
+
+.tag-green {
+  color: #2f7d5d;
+  background-color: #e6f4ee;
+}
+
+.tag-gray {
+  color: #8a9490;
+  background-color: #eef0ef;
+}
+
+.tag-orange {
+  color: #b5731a;
+  background-color: #fdf3e3;
+}
+
+.tag-red {
+  color: #c0453c;
+  background-color: #fdecea;
+}
+
+/* ---------- 按钮 ---------- */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  padding: 0 32rpx;
+  background-color: #2f7d5d;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 16rpx;
+}
+
+.btn-disabled {
+  background-color: #b7cec4 !important;
+  color: #f4f8f6 !important;
+}
+
+.btn-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60rpx;
+  padding: 0 24rpx;
+  background-color: #ffffff;
+  border: 1rpx solid #d5e0da;
+  border-radius: 12rpx;
+  color: #2f7d5d;
+  font-size: 26rpx;
+  line-height: 1;
+}
+
+.btn-ghost.danger {
+  color: #c0453c;
+  border-color: #f0cfcc;
+}
+
+.btn-hover {
+  opacity: 0.82;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  line-height: inherit;
+}
+
+button::after {
+  border: none;
+}
+
+/* ---------- 空状态（纯 CSS 圆形 + 文字，不引用外部图片） ---------- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 48rpx;
+}
+
+.empty-icon {
+  width: 132rpx;
+  height: 132rpx;
+  border-radius: 50%;
+  background-color: #e7f3ed;
+  color: #2f7d5d;
+  font-size: 56rpx;
+  font-weight: 600;
+  line-height: 132rpx;
+  text-align: center;
+}
+
+.empty-text {
+  margin-top: 28rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #42504a;
+}
+
+.empty-sub {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: #9aa5a0;
+  text-align: center;
+}
+
+.empty-btn {
+  width: 280rpx;
+  height: 80rpx;
+  margin-top: 36rpx;
+  font-size: 28rpx;
+}
+
+/* ---------- 通用表单 ---------- */
+.ph {
+  color: #b4bdb9;
+}
+
+.arrow {
+  font-size: 36rpx;
+  line-height: 1;
+  color: #c3ccc8;
+}

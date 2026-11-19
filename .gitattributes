@@ -1,0 +1,16 @@
+# 统一换行与二进制文件处理
+* text=auto eol=lf
+
+# Windows 脚本必须 CRLF，否则 cmd 解析异常
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# 二进制
+*.jar binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.xlsx binary
+*.docx binary

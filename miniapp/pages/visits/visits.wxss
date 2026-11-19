@@ -1,0 +1,110 @@
+.visits-page {
+  padding-top: 0;
+}
+
+.hero {
+  margin: 0 -24rpx;
+  padding: 28rpx 40rpx 36rpx;
+  background: linear-gradient(135deg, #2f7d5d 0%, #3d9772 100%);
+  border-radius: 0 0 32rpx 32rpx;
+}
+
+.hero-title {
+  color: #ffffff;
+  font-size: 40rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+}
+
+.hero-sub {
+  margin-top: 10rpx;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 24rpx;
+}
+
+.gap-top {
+  margin-top: 28rpx;
+}
+
+.visit-card {
+  position: relative;
+  margin-top: 16rpx;
+  padding: 28rpx 64rpx 24rpx 24rpx;
+}
+
+.visit-hover {
+  background-color: #f7faf8;
+}
+
+.visit-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.visit-head-left {
+  display: flex;
+  align-items: baseline;
+  flex: 1;
+  min-width: 0;
+}
+
+.visit-date {
+  flex-shrink: 0;
+  color: #1f2d27;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.visit-doctor {
+  overflow: hidden;
+  margin-left: 16rpx;
+  color: #42504a;
+  font-size: 26rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.visit-meta {
+  overflow: hidden;
+  margin-top: 14rpx;
+  color: #8a9490;
+  font-size: 24rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.visit-foot {
+  display: flex;
+  align-items: center;
+  margin-top: 14rpx;
+}
+
+.visit-no {
+  color: #b4bdb9;
+  font-size: 22rpx;
+}
+
+.visit-type {
+  margin-left: 16rpx;
+  padding: 0 10rpx;
+  background-color: #eef4f0;
+  border-radius: 6rpx;
+  color: #2f7d5d;
+  font-size: 20rpx;
+  line-height: 32rpx;
+}
+
+.visit-arrow {
+  position: absolute;
+  top: 50%;
+  right: 24rpx;
+  transform: translateY(-50%);
+}
+
+.list-footer {
+  padding: 28rpx 0 8rpx;
+  color: #b4bdb9;
+  font-size: 22rpx;
+  text-align: center;
+}

@@ -1,0 +1,154 @@
+.mine-page {
+  padding-top: 0;
+}
+
+/* ---------- 资料头部 ---------- */
+.profile-card {
+  display: flex;
+  align-items: center;
+  margin: 0 -24rpx;
+  padding: 48rpx 40rpx 88rpx;
+  background: linear-gradient(135deg, #2f7d5d 0%, #3d9772 100%);
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 120rpx;
+  height: 120rpx;
+  margin-right: 28rpx;
+  background-color: rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  color: #2f7d5d;
+  font-size: 52rpx;
+  font-weight: 600;
+  line-height: 120rpx;
+  text-align: center;
+}
+
+.profile-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 38rpx;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-phone {
+  margin-top: 8rpx;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 26rpx;
+}
+
+.profile-no {
+  display: inline-block;
+  margin-top: 12rpx;
+  padding: 2rpx 14rpx;
+  background-color: rgba(255, 255, 255, 0.18);
+  border-radius: 8rpx;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 22rpx;
+  line-height: 34rpx;
+}
+
+/* ---------- 会员余额 ---------- */
+.balance-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -56rpx 8rpx 0;
+  padding: 28rpx 32rpx;
+}
+
+.balance-label {
+  color: #8a9490;
+  font-size: 24rpx;
+}
+
+.balance-value {
+  margin-top: 6rpx;
+  color: #2f7d5d;
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.balance-tip {
+  color: #b4bdb9;
+  font-size: 22rpx;
+}
+
+/* ---------- 菜单 ---------- */
+.menu-card {
+  margin-top: 24rpx;
+  padding: 0 24rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  min-height: 104rpx;
+  border-bottom: 1rpx solid #f0f3f1;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-hover {
+  opacity: 0.7;
+}
+
+.menu-icon {
+  flex-shrink: 0;
+  width: 64rpx;
+  height: 64rpx;
+  margin-right: 24rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 64rpx;
+  text-align: center;
+}
+
+.icon-green {
+  background-color: #e7f3ed;
+  color: #2f7d5d;
+}
+
+.icon-blue {
+  background-color: #e8f2fb;
+  color: #1f6fb2;
+  font-family: Georgia, serif;
+}
+
+.icon-red {
+  background-color: #fdecea;
+  color: #c0453c;
+}
+
+.menu-text {
+  flex: 1;
+  color: #1f2d27;
+  font-size: 28rpx;
+}
+
+.menu-danger {
+  color: #c0453c;
+}
+
+.menu-arrow {
+  margin-left: 12rpx;
+}
+
+.mine-footer {
+  padding: 56rpx 0 16rpx;
+  color: #b4bdb9;
+  font-size: 22rpx;
+  text-align: center;
+}

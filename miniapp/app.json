@@ -1,0 +1,47 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/appointments/appointments",
+    "pages/visits/visits",
+    "pages/visit-detail/visit-detail",
+    "pages/mine/mine",
+    "pages/login/login"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#2f7d5d",
+    "navigationBarTitleText": "医馆 HIS",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f7f6",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#8a9490",
+    "selectedColor": "#2f7d5d",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "预约",
+        "iconPath": "assets/tab/book.png",
+        "selectedIconPath": "assets/tab/book-active.png"
+      },
+      {
+        "pagePath": "pages/appointments/appointments",
+        "text": "我的预约",
+        "iconPath": "assets/tab/list.png",
+        "selectedIconPath": "assets/tab/list-active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "assets/tab/user.png",
+        "selectedIconPath": "assets/tab/user-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

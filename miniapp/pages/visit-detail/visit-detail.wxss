@@ -1,0 +1,340 @@
+.detail-page {
+  padding-top: 24rpx;
+}
+
+/* ---------- 概要 ---------- */
+.summary-card {
+  padding: 32rpx;
+  background: linear-gradient(135deg, #2f7d5d 0%, #3d9772 100%);
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(47, 125, 93, 0.25);
+}
+
+.summary-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-doctor {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-doctor-name {
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 36rpx;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-type {
+  flex-shrink: 0;
+  margin-left: 12rpx;
+  padding: 0 10rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 6rpx;
+  color: #ffffff;
+  font-size: 20rpx;
+  line-height: 32rpx;
+}
+
+.summary-tag {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+.summary-time {
+  margin-top: 16rpx;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 26rpx;
+}
+
+.summary-meta {
+  margin-top: 8rpx;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 22rpx;
+}
+
+/* ---------- 患者信息 ---------- */
+.info-card {
+  padding: 8rpx 24rpx;
+}
+
+.info-row {
+  display: flex;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f3f1;
+  font-size: 26rpx;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  flex-shrink: 0;
+  width: 180rpx;
+  color: #9aa5a0;
+}
+
+.info-value {
+  flex: 1;
+  color: #1f2d27;
+  word-break: break-all;
+}
+
+/* ---------- 病历 ---------- */
+.record-card {
+  padding: 8rpx 24rpx;
+}
+
+.record-item {
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid #f0f3f1;
+}
+
+.record-item:last-child {
+  border-bottom: none;
+}
+
+.record-label {
+  color: #2f7d5d;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.record-value {
+  margin-top: 8rpx;
+  color: #42504a;
+  font-size: 27rpx;
+  line-height: 1.7;
+  word-break: break-all;
+}
+
+/* ---------- 处方 ---------- */
+.rx-card {
+  margin-bottom: 16rpx;
+  padding: 28rpx 24rpx;
+}
+
+.rx-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rx-title {
+  display: flex;
+  align-items: baseline;
+  flex: 1;
+  min-width: 0;
+}
+
+.rx-type {
+  flex-shrink: 0;
+  color: #1f2d27;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.rx-no {
+  overflow: hidden;
+  margin-left: 12rpx;
+  color: #b4bdb9;
+  font-size: 22rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rx-sub {
+  margin-top: 10rpx;
+  color: #8a9490;
+  font-size: 24rpx;
+}
+
+.rx-items {
+  margin-top: 12rpx;
+  border-top: 1rpx solid #f0f3f1;
+}
+
+.rx-item {
+  padding: 20rpx 0;
+  border-bottom: 1rpx dashed #eef2f0;
+}
+
+.rx-item:last-child {
+  border-bottom: none;
+}
+
+.rx-drug-main {
+  display: flex;
+  align-items: baseline;
+}
+
+.rx-drug-name {
+  color: #1f2d27;
+  font-size: 27rpx;
+  font-weight: 500;
+}
+
+.rx-drug-spec {
+  margin-left: 12rpx;
+  color: #9aa5a0;
+  font-size: 22rpx;
+}
+
+.rx-drug-usage {
+  margin-top: 6rpx;
+  color: #8a9490;
+  font-size: 22rpx;
+}
+
+.rx-drug-nums {
+  display: flex;
+  align-items: center;
+  margin-top: 6rpx;
+  color: #8a9490;
+  font-size: 22rpx;
+}
+
+.rx-drug-dose {
+  margin-right: 20rpx;
+}
+
+.rx-drug-qty {
+  flex: 1;
+}
+
+.rx-drug-amount {
+  color: #42504a;
+  font-size: 24rpx;
+}
+
+.rx-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f3f1;
+}
+
+.rx-total-label {
+  color: #8a9490;
+  font-size: 24rpx;
+}
+
+.rx-total-value {
+  color: #2f7d5d;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+/* ---------- 费用 ---------- */
+.charge-card {
+  margin-bottom: 16rpx;
+  padding: 28rpx 24rpx;
+}
+
+.charge-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.charge-title {
+  display: flex;
+  align-items: baseline;
+  flex: 1;
+  min-width: 0;
+}
+
+.charge-type {
+  flex-shrink: 0;
+  color: #1f2d27;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.charge-no {
+  overflow: hidden;
+  margin-left: 12rpx;
+  color: #b4bdb9;
+  font-size: 22rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.charge-items {
+  margin-top: 12rpx;
+  padding-top: 8rpx;
+  border-top: 1rpx solid #f0f3f1;
+}
+
+.charge-item {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 0;
+  font-size: 24rpx;
+}
+
+.charge-item-name {
+  flex: 1;
+  overflow: hidden;
+  color: #42504a;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.charge-item-qty {
+  width: 100rpx;
+  color: #9aa5a0;
+  text-align: right;
+}
+
+.charge-item-amount {
+  width: 150rpx;
+  color: #42504a;
+  text-align: right;
+}
+
+.charge-foot {
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx dashed #eef2f0;
+}
+
+.charge-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6rpx 0;
+  color: #8a9490;
+  font-size: 24rpx;
+}
+
+.charge-line.strong {
+  color: #1f2d27;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.charge-time {
+  margin-top: 8rpx;
+  color: #b4bdb9;
+  font-size: 20rpx;
+  text-align: right;
+}
+
+.detail-footer {
+  padding: 32rpx 16rpx 8rpx;
+  color: #b4bdb9;
+  font-size: 22rpx;
+  line-height: 1.7;
+  text-align: center;
+}

@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: yiguan-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123456}
+      MYSQL_DATABASE: yiguan_his
+      MYSQL_USER: yiguan
+      MYSQL_PASSWORD: ${DB_PASSWORD:-yiguan123}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-root123456}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    ports:
+      - "3306:3306"
+
+  backend:
+    build: ./backend
+    container_name: yiguan-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: yiguan_his
+      DB_USER: yiguan
+      DB_PASSWORD: ${DB_PASSWORD:-yiguan123}
+      JWT_SECRET: ${JWT_SECRET:-please-change-this-secret-in-production-0123456789}
+      TZ: Asia/Shanghai
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: yiguan-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  mysql-data:
