@@ -1,5 +1,12 @@
 # 方笺 · 开源中医馆信息管理系统
 
+[![CI](https://github.com/othellllo/fangjian-clinic/actions/workflows/ci.yml/badge.svg)](https://github.com/othellllo/fangjian-clinic/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/othellllo/fangjian-clinic)](https://github.com/othellllo/fangjian-clinic/releases)
+[![Checks](https://img.shields.io/badge/%E7%AB%AF%E5%88%B0%E7%AB%AF%E6%A3%80%E6%9F%A5-106%20%E9%A1%B9-brightgreen)](scripts/README.md)
+
+> 仓库：<https://github.com/othellllo/fangjian-clinic> · 便携版下载：[Releases](https://github.com/othellllo/fangjian-clinic/releases)
+
 面向**中医馆 / 医馆 / 小型诊所**的开源信息管理系统，覆盖「挂号 → 候诊 → 接诊 → 开方 → 收费 → 发药 → 报表」的完整门诊闭环，并按中医业务特点设计病历（四诊、辨证、治则）与饮片库存（批号、效期、先进先出）。
 
 参考产品：ABC 诊所管家（学习其业务流程与信息结构，代码为独立实现）。
