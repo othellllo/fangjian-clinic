@@ -81,3 +81,10 @@ powershell -ExecutionPolicy Bypass -File scripts\build-portable.ps1 -Zip
 | 脚本 | 用途 |
 | --- | --- |
 | `smoke-v7.mjs` | 开方效率冒烟（9 项）：拼音首字母/中文/编码搜药、联想字段、limit、常见证型与主诉、历史高频优先 |
+
+## v8 新增脚本
+
+| 脚本 | 用途 |
+| --- | --- |
+| `smoke-v8.mjs` | 结构化用法冒烟（6 项）：用法字典、途径+频次拼装、自定义优先、煎法叠加、未知代码容错 |
+| `ui-check-v8.mjs` | 键盘流验证 + 截图：选药聚焦剂量框、回车回检索、两味药明细与用法下拉 |

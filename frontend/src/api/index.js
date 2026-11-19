@@ -166,3 +166,6 @@ export const pharmacyScanOut = (data) => request.post('/pharmacy/scan-out', data
 /* ---------------- 开方效率（v7） ---------------- */
 export const suggestDrugs = (params) => request.get('/drugs/suggest', { params })
 export const commonTerms = (params) => request.get('/tcm/common', { params })
+
+/* ---------------- 结构化用法（v8） ---------------- */
+export const getDosageDict = () => request.get('/dict/dosage')

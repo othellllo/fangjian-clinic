@@ -130,8 +130,17 @@ public class PrescriptionService {
             item.setPrice(drug.getPrice());
             item.setAmount(drug.getPrice().multiply(quantity).setScale(2, java.math.RoundingMode.HALF_UP));
             // 特殊煎法自动标注（先煎/后下/包煎/另煎/烊化/冲服）
-            item.setUsageText(PrescriptionCheckService.appendHandling(source.usageText(),
-                    drug.getSpecialHandling()));
+            // 结构化用法：给药途径 + 频次 → 规范文本；医生自定义文本优先
+            item.setUsageRouteCode(source.usageRouteCode());
+            item.setUsageFrequencyCode(source.usageFrequencyCode());
+            item.setUsageRoute(com.fangjian.clinic.common.DosageDict.routeLabel(source.usageRouteCode()));
+            item.setUsageFrequency(com.fangjian.clinic.common.DosageDict.frequencyLabel(source.usageFrequencyCode()));
+            String usage = source.usageText();
+            if (usage == null || usage.isBlank()) {
+                usage = com.fangjian.clinic.common.DosageDict.compose(
+                        source.usageRouteCode(), source.usageFrequencyCode());
+            }
+            item.setUsageText(PrescriptionCheckService.appendHandling(usage, drug.getSpecialHandling()));
             total = total.add(item.getAmount());
             items.add(item);
         }
@@ -240,7 +249,9 @@ public class PrescriptionService {
         List<PrescriptionDto.Item> items = itemRepository.findByPrescriptionId(prescription.getId()).stream()
                 .map(item -> new PrescriptionDto.Item(item.getId(), item.getDrugId(), item.getDrugName(),
                         item.getSpec(), item.getUnit(), item.getDose(), item.getQuantity(),
-                        item.getPrice(), item.getAmount(), item.getUsageText()))
+                        item.getPrice(), item.getAmount(), item.getUsageText(),
+                        item.getUsageRoute(), item.getUsageRouteCode(),
+                        item.getUsageFrequency(), item.getUsageFrequencyCode()))
                 .toList();
         return new PrescriptionDto(prescription.getId(), prescription.getPrescriptionNo(),
                 prescription.getVisitId(),
@@ -257,6 +268,7 @@ public class PrescriptionService {
     }
 
     /** 处方明细请求。 */
-    public record ItemRequest(Long drugId, BigDecimal dose, BigDecimal quantity, String usageText) {
+    public record ItemRequest(Long drugId, BigDecimal dose, BigDecimal quantity, String usageText,
+                              String usageRouteCode, String usageFrequencyCode) {
     }
 }

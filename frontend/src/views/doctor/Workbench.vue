@@ -202,9 +202,10 @@
                     <span class="drug-search-hint">药名 / 拼音首字母，如 hq</span>
                   </span>
                 </template>
-                <el-select v-model="selectedDrugId" class="drug-select" filterable remote clearable size="large"
-                  placeholder="药名 / 拼音首字母，如 hq" :remote-method="searchDrugs" :loading="drugSearchLoading"
-                  @change="onSelectDrug" @visible-change="onDrugSelectVisible">
+                <el-select ref="drugSelectRef" v-model="selectedDrugId" class="drug-select" filterable remote clearable
+                  size="large" default-first-option placeholder="药名 / 拼音首字母，如 hq"
+                  :remote-method="searchDrugs" :loading="drugSearchLoading" @change="onSelectDrug"
+                  @visible-change="onDrugSelectVisible">
                   <el-option v-for="d in drugOptions" :key="d.id" :label="drugOptionLabel(d)" :value="d.id">
                     <div class="drug-option">
                       <span class="drug-option-name">{{ d.name }}</span>
@@ -268,14 +269,15 @@
                 </template>
               </el-table-column>
               <el-table-column label="单次剂量" width="92">
-                <template #default="{ row }">
-                  <el-input v-model="row.dose" size="small" placeholder="如 10g" />
+                <template #default="{ row, $index }">
+                  <el-input :ref="(el) => setDoseInputRef($index, el)" v-model="row.dose" size="small"
+                    placeholder="如 10g" class="dose-input" @keydown.enter.prevent="focusDrugSearch" />
                 </template>
               </el-table-column>
               <el-table-column label="数量" width="100">
                 <template #default="{ row }">
                   <el-input-number v-model="row.quantity" :min="1" :max="9999" size="small"
-                    controls-position="right" class="qty-input" />
+                    controls-position="right" class="qty-input" @keydown.enter.prevent="focusDrugSearch" />
                 </template>
               </el-table-column>
               <el-table-column label="金额" width="80" align="right">
@@ -283,9 +285,22 @@
                   <span class="money">{{ formatMoney(itemAmount(row)) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="用法" min-width="110">
+              <el-table-column label="用法（途径 / 频次）" width="136">
                 <template #default="{ row }">
-                  <el-input v-model="row.usageText" size="small" placeholder="如 每日一剂" />
+                  <div class="usage-cell">
+                    <el-select v-model="row.usageRouteCode" size="small" class="usage-select" filterable allow-create
+                      default-first-option placeholder="途径"
+                      :class="{ 'is-custom': !!row.usageRouteCode && !isRouteCode(row.usageRouteCode) }">
+                      <el-option v-for="route in dosageDict.routes" :key="route.code" :label="route.label"
+                        :value="route.code" />
+                    </el-select>
+                    <el-select v-model="row.usageFrequencyCode" size="small" class="usage-select" filterable
+                      allow-create default-first-option placeholder="频次"
+                      :class="{ 'is-custom': !!row.usageFrequencyCode && !isFrequencyCode(row.usageFrequencyCode) }">
+                      <el-option v-for="freq in dosageDict.frequencies" :key="freq.code"
+                        :label="frequencyOptionLabel(freq)" :value="freq.code" />
+                    </el-select>
+                  </div>
                 </template>
               </el-table-column>
               <el-table-column label="操作" width="56" align="center" fixed="right">
@@ -417,7 +432,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/store/user'
 import {
@@ -429,6 +444,7 @@ import {
   fetchPrescriptionHtml,
   finishVisit,
   getAiSettings,
+  getDosageDict,
   getQueue,
   getRecord,
   getVisit,
@@ -1142,6 +1158,144 @@ const submittingRx = ref(false)
 const printingRxId = ref(null)
 const pregnantStatus = ref('')
 
+/* ---------------- 结构化用法字典（v8：给药途径 + 频次） ----------------
+ * 内置兜底字典与 /api/dict/dosage、后端 DosageDict 一致；接口可用时以接口返回为准。
+ */
+const FALLBACK_ROUTES = [
+  { code: 'po', label: '口服' },
+  { code: 'jian', label: '煎服（水煎服）' },
+  { code: 'chong', label: '冲服' },
+  { code: 'han', label: '含服' },
+  { code: 'shexia', label: '舌下含服' },
+  { code: 'top', label: '外用' },
+  { code: 'xunxi', label: '熏洗' },
+  { code: 'di_yan', label: '滴眼' },
+  { code: 'di_er', label: '滴耳' },
+  { code: 'di_bi', label: '滴鼻' },
+  { code: 'pen_bi', label: '喷鼻' },
+  { code: 'xiru', label: '吸入' },
+  { code: 'guanchang', label: '灌肠' },
+  { code: 'zhichang', label: '直肠给药' },
+  { code: 'bisi', label: '鼻饲' },
+  { code: 'cha', label: '代茶饮' }
+]
+const FALLBACK_FREQUENCIES = [
+  { code: 'qd', label: '一日一次' },
+  { code: 'bid', label: '一日两次' },
+  { code: 'tid', label: '一日三次' },
+  { code: 'qid', label: '一日四次' },
+  { code: 'q6h', label: '每6小时一次' },
+  { code: 'q8h', label: '每8小时一次' },
+  { code: 'q12h', label: '每12小时一次' },
+  { code: 'qod', label: '隔日一次' },
+  { code: 'biw', label: '每周两次' },
+  { code: 'qw', label: '每周一次' },
+  { code: 'prn', label: '必要时' },
+  { code: 'sos', label: '需要时' },
+  { code: 'st', label: '立即' },
+  { code: 'hs', label: '睡前' },
+  { code: 'ac', label: '饭前' },
+  { code: 'pc', label: '饭后' }
+]
+
+const dosageDict = ref({ routes: FALLBACK_ROUTES, frequencies: FALLBACK_FREQUENCIES })
+
+async function loadDosageDict() {
+  try {
+    const data = await getDosageDict()
+    const routes = Array.isArray(data?.routes) ? data.routes.filter((r) => r && r.code) : []
+    const frequencies = Array.isArray(data?.frequencies) ? data.frequencies.filter((f) => f && f.code) : []
+    if (routes.length) dosageDict.value.routes = routes
+    if (frequencies.length) dosageDict.value.frequencies = frequencies
+  } catch {
+    /* 字典接口不可用时继续使用内置字典 */
+  }
+}
+
+function isRouteCode(value) {
+  return dosageDict.value.routes.some((route) => route.code === value)
+}
+
+function isFrequencyCode(value) {
+  return dosageDict.value.frequencies.some((freq) => freq.code === value)
+}
+
+function routeLabelText(value) {
+  const route = dosageDict.value.routes.find((item) => item.code === value)
+  return route ? route.label : String(value ?? '')
+}
+
+function frequencyLabelText(value) {
+  const freq = dosageDict.value.frequencies.find((item) => item.code === value)
+  return freq ? freq.label : String(value ?? '')
+}
+
+/* 频次下拉显示「一日三次 (tid)」 */
+function frequencyOptionLabel(freq) {
+  return freq?.label ? `${freq.label} (${freq.code})` : String(freq?.code ?? '')
+}
+
+/* 加药默认用法：中药=煎服/qd，中成药与西药=口服/tid */
+function usageDefaults() {
+  return rxType.value === 'HERB'
+    ? { usageRouteCode: 'jian', usageFrequencyCode: 'qd' }
+    : { usageRouteCode: 'po', usageFrequencyCode: 'tid' }
+}
+
+/*
+ * 提交用结构化用法：
+ * - 途径/频次都在字典内 → 传 usageRouteCode + usageFrequencyCode，由服务端拼中文
+ * - 医生自定义了字典外文本 → 拼成原文字串放 usageText，且不传 code（服务端以自定义为准）
+ */
+function buildUsagePayload(item) {
+  const routeValue = String(item.usageRouteCode ?? '').trim()
+  const freqValue = String(item.usageFrequencyCode ?? '').trim()
+  const routeIsCode = isRouteCode(routeValue)
+  const freqIsCode = isFrequencyCode(freqValue)
+  const hasCustom = (routeValue && !routeIsCode) || (freqValue && !freqIsCode)
+  if (hasCustom) {
+    const parts = []
+    if (routeValue) parts.push(routeIsCode ? routeLabelText(routeValue) : routeValue)
+    if (freqValue) parts.push(freqIsCode ? frequencyLabelText(freqValue) : freqValue)
+    return { usageText: parts.join('，') || null, usageRouteCode: null, usageFrequencyCode: null }
+  }
+  return {
+    usageText: null,
+    usageRouteCode: routeValue || null,
+    usageFrequencyCode: freqValue || null
+  }
+}
+
+/* ---------------- 键盘流：选药 → 单次剂量 → 回药品搜索 ---------------- */
+const drugSelectRef = ref(null)
+const doseInputRefs = []
+
+function setDoseInputRef(index, el) {
+  doseInputRefs[index] = el
+}
+
+/* 选中药品后：光标跳到该行「单次剂量」输入框并全选，医生直接敲克数 */
+function focusDoseInput(index) {
+  nextTick(() => {
+    const input = doseInputRefs[index]
+    if (!input) return
+    input.focus?.()
+    input.select?.()
+  })
+}
+
+/* 剂量/数量回车：光标回到顶部药品搜索框（Element Plus 关闭下拉时已清空过滤关键字） */
+function focusDrugSearch() {
+  const select = drugSelectRef.value
+  if (!select) return
+  select.blur?.()
+  nextTick(() => {
+    selectedDrugId.value = null
+    select.focus?.()
+  })
+}
+
+
 const rxTotal = computed(() =>
   rxItems.value.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0)
 )
@@ -1225,9 +1379,12 @@ function onSelectDrug(drugId) {
   if (!drugId) return
   const drug = drugOptions.value.find((d) => d.id === drugId)
   if (!drug) return
+  const defaults = usageDefaults()
+  let targetIndex = -1
   const existing = rxItems.value.find((item) => item.drugId === drugId)
   if (existing) {
     existing.quantity = Number(existing.quantity || 0) + 1
+    targetIndex = rxItems.value.indexOf(existing)
   } else {
     rxItems.value.push({
       drugId: drug.id,
@@ -1237,15 +1394,18 @@ function onSelectDrug(drugId) {
       price: drug.price,
       dose: '',
       quantity: 1,
-      usageText: '',
       needTrace: !!drug.needTrace,
-      stockQty: drug.stockQty
+      stockQty: drug.stockQty,
+      usageRouteCode: defaults.usageRouteCode,
+      usageFrequencyCode: defaults.usageFrequencyCode
     })
+    targetIndex = rxItems.value.length - 1
   }
   if (stockLevel(drug) === 'out') {
     ElMessage.warning(`「${drug.name}」当前库存为 0，开方前请与药房确认`)
   }
   selectedDrugId.value = null
+  if (targetIndex >= 0) focusDoseInput(targetIndex)
 }
 
 function removeRxItem(index) {
@@ -1417,7 +1577,7 @@ async function submitPrescription() {
         // 后端 ItemRequest.dose 为 BigDecimal（单位取自药品字典），故按数值提交
         dose: parseDoseNumber(item.dose),
         quantity: Number(item.quantity),
-        usageText: item.usageText?.trim() || null
+        ...buildUsagePayload(item)
       }))
     })
     ElMessage.success('处方已开具')
@@ -1435,11 +1595,15 @@ async function submitPrescription() {
 /* ---------------- 联动 ---------------- */
 watch(recordType, () => scheduleQc())
 watch(() => JSON.stringify(recordForm), () => scheduleQc())
-watch(rxItems, () => scheduleRxCheck(), { deep: true })
+/* 用药安全审查只在药品/剂量/数量变化时触发（改用法不必重复审查） */
+watch(
+  () => rxItems.value.map((item) => `${item.drugId}:${item.dose}:${item.quantity}`).join('|'),
+  () => scheduleRxCheck()
+)
 watch(pregnantStatus, () => scheduleRxCheck())
 
 onMounted(async () => {
-  await Promise.all([loadDoctors(), loadAiSettings()])
+  await Promise.all([loadDoctors(), loadAiSettings(), loadDosageDict()])
   await refreshAll()
 })
 
@@ -1935,6 +2099,41 @@ onBeforeUnmount(() => {
 
 .qty-input {
   width: 100%;
+}
+
+/* 单次剂量：居中便于键盘速录 */
+.dose-input :deep(.el-input__inner) {
+  text-align: center;
+  font-weight: 600;
+}
+
+/* 结构化用法：途径 + 频次 两个紧凑下拉（列宽 136px，每个 90~120px） */
+.usage-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.usage-select {
+  width: 100%;
+}
+
+.usage-select :deep(.el-select__wrapper) {
+  min-height: 24px;
+  padding: 1px 8px;
+  font-size: 12px;
+}
+
+.usage-select :deep(.el-select__selected-item) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 字典外的自定义用法：橙色描边提示 */
+.usage-select.is-custom :deep(.el-select__wrapper) {
+  box-shadow: 0 0 0 1px #e6a23c inset;
 }
 
 /* 合计金额大号显示 */

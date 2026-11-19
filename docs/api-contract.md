@@ -442,3 +442,34 @@ AI 只返回草稿，不入库；医生确认后随病历保存。
 - 典型用法：主诉 `SYMPTOM`、证候/中医病名 `SYNDROME`、舌象 `TONGUE`、脉象 `PULSE`、
   治则 `TREATMENT`、西医诊断 `DIAGNOSIS`。
 - 与 `/tcm/suggest` 的区别：`suggest` 按关键字搜索；`common` 用于"还没输入时先给常用项"。
+
+---
+
+# 第八版新增接口（v8）：结构化用法（给药途径 + 频次）
+
+## 31. 用法字典
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/dict/dosage` | `{routes:[{code,label}], frequencies:[{code,label}]}` |
+
+- 途径：`po` 口服、`jian` 煎服（水煎服）、`chong` 冲服、`han` 含服、`shexia` 舌下含服、`top` 外用、
+  `xunxi` 熏洗、`di_yan` 滴眼、`di_er` 滴耳、`di_bi` 滴鼻、`pen_bi` 喷鼻、`xiru` 吸入、
+  `guanchang` 灌肠、`zhichang` 直肠给药、`bisi` 鼻饲、`cha` 代茶饮
+- 频次：`qd` 一日一次、`bid` 一日两次、`tid` 一日三次、`qid` 一日四次、`q6h/q8h/q12h`、
+  `qod` 隔日一次、`biw` 每周两次、`qw` 每周一次、`prn` 必要时、`sos` 需要时、`st` 立即、`hs` 睡前、`ac` 饭前、`pc` 饭后
+
+## 32. 处方明细的结构化用法
+
+`POST /prescriptions` 的 `items[]` 新增两个可选字段：
+
+```json
+{ "drugId": 1, "dose": 10, "quantity": 70,
+  "usageRouteCode": "jian", "usageFrequencyCode": "bid" }
+```
+
+- 服务端把代码转成中文并拼成 `usageText`（如「煎服（水煎服），一日两次」）；
+- 若医生填了自定义 `usageText`，以自定义为准（不会被覆盖）；
+- 特殊煎法（先煎/后下等）仍会追加到用法后面。
+- `PrescriptionDto.Item` 新增返回字段：`usageRoute`、`usageRouteCode`、`usageFrequency`、`usageFrequencyCode`。
+- 未知代码忽略，不会导致报错。

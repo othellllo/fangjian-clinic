@@ -34,6 +34,10 @@ public record PrescriptionDto(
             BigDecimal quantity,
             BigDecimal price,
             BigDecimal amount,
-            String usageText) {
+            String usageText,
+            String usageRoute,
+            String usageRouteCode,
+            String usageFrequency,
+            String usageFrequencyCode) {
     }
 }

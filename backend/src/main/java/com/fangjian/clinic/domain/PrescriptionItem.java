@@ -47,7 +47,21 @@ public class PrescriptionItem extends BaseEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount = BigDecimal.ZERO;
 
-    /** 用法：水煎服、日一剂分两次温服 等。 */
+    /** 用法文本（展示/打印用）；由途径 + 频次自动拼装，也可医生自定义。 */
     @Column(name = "usage_text", length = 200)
     private String usageText;
+
+    /** 给药途径（中文，如 口服/外用/煎服）。 */
+    @Column(name = "usage_route", length = 30)
+    private String usageRoute;
+
+    @Column(name = "usage_route_code", length = 20)
+    private String usageRouteCode;
+
+    /** 用药频次（中文，如 一日三次）。 */
+    @Column(name = "usage_frequency", length = 50)
+    private String usageFrequency;
+
+    @Column(name = "usage_frequency_code", length = 20)
+    private String usageFrequencyCode;
 }
