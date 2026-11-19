@@ -44,6 +44,14 @@ public class DrugController {
         return ApiResponse.ok(drugService.page(keyword, category, page, size));
     }
 
+    /** 开方联想：名称 / 编码 / 拼音首字母模糊搜索。 */
+    @GetMapping("/suggest")
+    public ApiResponse<java.util.List<DrugDto>> suggest(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "10") int limit) {
+        return ApiResponse.ok(drugService.suggest(keyword, limit));
+    }
+
     @PostMapping
     public ApiResponse<DrugDto> create(@RequestBody DrugRequest request) {
         return ApiResponse.ok(drugService.create(request.code(), request.name(), request.pinyin(),

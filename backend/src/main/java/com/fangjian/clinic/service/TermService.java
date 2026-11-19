@@ -68,6 +68,45 @@ public class TermService {
         return result;
     }
 
+    /**
+     * 常见项：光标进入输入框、还没输入内容时展示。
+     * 优先按本院历史病历出现频次排序，再用标准术语库补齐。
+     */
+    public List<QcResult.Suggestion> common(TermCategory category, int limit) {
+        int size = Math.max(1, Math.min(limit, 30));
+        Set<String> seen = new LinkedHashSet<>();
+        List<QcResult.Suggestion> result = new ArrayList<>();
+        String column = historyColumn(category);
+        if (column != null) {
+            String sql = "select " + column + " as v, count(*) as c from medical_record "
+                    + "where " + column + " is not null and " + column + " <> '' "
+                    + "group by " + column + " order by c desc";
+            List<java.util.Map<String, Object>> rows = jdbc.queryForList(sql);
+            for (java.util.Map<String, Object> row : rows) {
+                String value = String.valueOf(row.get("v"));
+                if (seen.add(value)) {
+                    result.add(new QcResult.Suggestion(value, null, category.name(), "HISTORY",
+                            ((Number) row.get("c")).intValue()));
+                }
+                if (result.size() >= size) {
+                    break;
+                }
+            }
+        }
+        if (result.size() < size) {
+            for (MedicalTerm term : termRepository.suggest(category, "", PageRequest.of(0, size))) {
+                if (seen.add(term.getTerm())) {
+                    result.add(new QcResult.Suggestion(term.getTerm(), term.getPinyin(),
+                            term.getCategory().name(), term.getSource(), term.getUsageCount()));
+                }
+                if (result.size() >= size) {
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     private String historyColumn(TermCategory category) {
         return switch (category) {
             case SYMPTOM -> "chief_complaint";

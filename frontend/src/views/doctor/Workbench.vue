@@ -144,15 +144,18 @@
                       <el-autocomplete v-if="field.suggest" v-model="recordForm[field.key]" value-key="term"
                         type="textarea" :rows="field.rows || 2" resize="vertical" clearable class="record-input"
                         :placeholder="field.placeholder" :maxlength="field.maxlength"
-                        :show-word-limit="!!field.maxlength" :debounce="250" :trigger-on-focus="false"
-                        :fetch-suggestions="suggestFetchers[field.suggest]">
+                        :show-word-limit="!!field.maxlength" :debounce="250"
+                        :trigger-on-focus="!!field.focusCommon"
+                        :fetch-suggestions="suggestFetcherFor(field)">
                         <template #default="{ item }">
                           <div class="suggest-row">
                             <span class="suggest-term">{{ item.term }}</span>
-                            <el-tag size="small" effect="plain" :type="item.source === 'SYSTEM' ? 'success' : 'info'">
+                            <el-tag size="small" effect="plain"
+                              :type="item.source === 'HISTORY' ? 'warning' : 'success'">
                               {{ SOURCE_TEXT[item.source] || '其他来源' }}
                             </el-tag>
-                            <span v-if="item.pinyin" class="suggest-pinyin">{{ item.pinyin }}</span>
+                            <span v-if="item.usageCount" class="suggest-count">{{ item.usageCount }} 次</span>
+                            <span v-else-if="item.pinyin" class="suggest-pinyin">{{ item.pinyin }}</span>
                           </div>
                         </template>
                       </el-autocomplete>
@@ -190,55 +193,67 @@
           <el-empty v-if="!currentVisit" description="接诊后可在此开具处方" :image-size="100" />
 
           <template v-else>
-            <el-form label-position="top" size="small" class="rx-form">
-              <el-form-item label="处方类型">
-                <el-radio-group v-model="rxType">
-                  <el-radio-button value="HERB">中药</el-radio-button>
-                  <el-radio-button value="PATENT">中成药</el-radio-button>
-                  <el-radio-button value="WESTERN">西药</el-radio-button>
-                </el-radio-group>
-              </el-form-item>
-              <el-row :gutter="12">
-                <el-col :span="12">
-                  <el-form-item label="剂数">
-                    <el-input-number v-model="rxDoses" :min="1" :max="99" size="small" style="width: 100%" />
-                  </el-form-item>
-                </el-col>
-                <el-col v-if="rxType === 'HERB'" :span="12">
-                  <el-form-item label="煎法">
-                    <el-select v-model="decoctionMethod" size="small" style="width: 100%">
-                      <el-option label="代煎" value="代煎" />
-                      <el-option label="自煎" value="自煎" />
-                      <el-option label="免煎颗粒" value="免煎颗粒" />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-              <el-form-item v-if="showPregnancy" label="妊娠状态">
-                <el-radio-group v-model="pregnantStatus">
-                  <el-radio-button value="">未知</el-radio-button>
-                  <el-radio-button value="YES">妊娠</el-radio-button>
-                  <el-radio-button value="NO">非妊娠</el-radio-button>
-                </el-radio-group>
-                <div class="text-muted pregnancy-hint">未知时不做妊娠禁忌判定，仅提示核对</div>
-              </el-form-item>
-
-              <el-form-item label="添加药品">
-                <el-select v-model="selectedDrugId" class="drug-select" filterable remote clearable size="small"
-                  placeholder="搜索药品名称 / 拼音码" :remote-method="searchDrugs" :loading="drugSearchLoading"
+            <el-form label-position="top" class="rx-form">
+              <!-- 药品搜索置顶：名称 / 编码 / 拼音首字母联想（v7 §29） -->
+              <el-form-item class="drug-search-item">
+                <template #label>
+                  <span class="drug-search-label">
+                    添加药品
+                    <span class="drug-search-hint">药名 / 拼音首字母，如 hq</span>
+                  </span>
+                </template>
+                <el-select v-model="selectedDrugId" class="drug-select" filterable remote clearable size="large"
+                  placeholder="药名 / 拼音首字母，如 hq" :remote-method="searchDrugs" :loading="drugSearchLoading"
                   @change="onSelectDrug" @visible-change="onDrugSelectVisible">
-                  <el-option v-for="d in drugOptions" :key="d.id"
-                    :label="`${d.name} / ${d.spec || '无规格'} / ${d.unit || '-'} / ￥${formatMoney(d.price)}`"
-                    :value="d.id" />
+                  <el-option v-for="d in drugOptions" :key="d.id" :label="drugOptionLabel(d)" :value="d.id">
+                    <div class="drug-option">
+                      <span class="drug-option-name">{{ d.name }}</span>
+                      <span class="drug-option-meta">
+                        {{ d.spec || '无规格' }} · {{ d.unit || '-' }} · ￥{{ formatMoney(d.price) }}
+                      </span>
+                      <el-tag v-if="d.needTrace" size="small" type="warning" effect="plain">需追溯</el-tag>
+                      <span class="drug-option-stock" :class="'stock-' + stockLevel(d)">{{ stockText(d) }}</span>
+                    </div>
+                  </el-option>
                 </el-select>
               </el-form-item>
+
+              <div class="rx-settings">
+                <el-form-item label="处方类型" class="rx-setting">
+                  <el-radio-group v-model="rxType">
+                    <el-radio-button value="HERB">中药</el-radio-button>
+                    <el-radio-button value="PATENT">中成药</el-radio-button>
+                    <el-radio-button value="WESTERN">西药</el-radio-button>
+                  </el-radio-group>
+                </el-form-item>
+                <el-form-item label="剂数" class="rx-setting rx-setting-doses">
+                  <el-input-number v-model="rxDoses" :min="1" :max="99" class="rx-setting-input" />
+                </el-form-item>
+                <el-form-item v-if="rxType === 'HERB'" label="煎法" class="rx-setting rx-setting-decoction">
+                  <el-select v-model="decoctionMethod" class="rx-setting-input">
+                    <el-option label="代煎" value="代煎" />
+                    <el-option label="自煎" value="自煎" />
+                    <el-option label="免煎颗粒" value="免煎颗粒" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item v-if="showPregnancy" label="妊娠状态" class="rx-setting">
+                  <el-radio-group v-model="pregnantStatus">
+                    <el-radio-button value="">未知</el-radio-button>
+                    <el-radio-button value="YES">妊娠</el-radio-button>
+                    <el-radio-button value="NO">非妊娠</el-radio-button>
+                  </el-radio-group>
+                </el-form-item>
+              </div>
             </el-form>
 
             <el-table :data="rxItems" size="small" border class="rx-items" empty-text="暂未添加药品">
-              <el-table-column label="药名 / 规格" min-width="150">
+              <el-table-column label="药名 / 规格" min-width="180">
                 <template #default="{ row }">
                   <div class="drug-name">
                     {{ row.drugName }}
+                    <el-tooltip v-if="row.needTrace" placement="top" content="发药时需扫码采集追溯码">
+                      <el-tag size="small" type="warning" effect="plain" class="handling-tag">需追溯</el-tag>
+                    </el-tooltip>
                     <el-tooltip v-if="rxAnnotations[row.drugId]" placement="top"
                       :content="rxAnnotations[row.drugId].note || '特殊煎法自动标注'">
                       <el-tag size="small" type="warning" effect="plain" class="handling-tag">
@@ -248,31 +263,32 @@
                   </div>
                   <div class="text-muted">
                     {{ [row.spec, row.unit].filter(Boolean).join(' / ') || '-' }} · 单价 ￥{{ formatMoney(row.price) }}
+                    · 库存 {{ formatStock(row.stockQty) }}
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column label="单次剂量" width="100">
+              <el-table-column label="单次剂量" width="92">
                 <template #default="{ row }">
                   <el-input v-model="row.dose" size="small" placeholder="如 10g" />
                 </template>
               </el-table-column>
-              <el-table-column label="数量" width="106">
+              <el-table-column label="数量" width="100">
                 <template #default="{ row }">
                   <el-input-number v-model="row.quantity" :min="1" :max="9999" size="small"
                     controls-position="right" class="qty-input" />
                 </template>
               </el-table-column>
-              <el-table-column label="金额" width="88" align="right">
+              <el-table-column label="金额" width="80" align="right">
                 <template #default="{ row }">
                   <span class="money">{{ formatMoney(itemAmount(row)) }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="用法" min-width="120">
+              <el-table-column label="用法" min-width="110">
                 <template #default="{ row }">
                   <el-input v-model="row.usageText" size="small" placeholder="如 每日一剂" />
                 </template>
               </el-table-column>
-              <el-table-column label="操作" width="64" align="center">
+              <el-table-column label="操作" width="56" align="center" fixed="right">
                 <template #default="{ $index }">
                   <el-button link type="danger" size="small" @click="removeRxItem($index)">删除</el-button>
                 </template>
@@ -280,8 +296,16 @@
             </el-table>
 
             <div class="rx-total">
-              <span class="text-muted">共 {{ rxItems.length }} 味 / {{ rxQuantityTotal }} 件</span>
-              <span>合计：<span class="money rx-amount">￥{{ formatMoney(rxTotal) }}</span></span>
+              <div class="rx-total-info">
+                <span class="rx-total-count">共 {{ rxItems.length }} 味 / {{ rxQuantityTotal }} 件</span>
+                <span class="text-muted">
+                  {{ rxType === 'HERB' ? (decoctionMethod || '未选煎法') : '西药 / 中成药' }} · {{ rxDoses }} 剂
+                </span>
+              </div>
+              <div class="rx-total-amount">
+                <span class="rx-total-label">合计</span>
+                <span class="money rx-amount">￥{{ formatMoney(rxTotal) }}</span>
+              </div>
             </div>
 
             <el-form label-position="top" size="small" class="rx-form">
@@ -326,8 +350,10 @@
 
             <div class="rx-submit">
               <span v-if="rxChecking" class="text-muted rx-checking">安全审查中…</span>
-              <el-button type="primary" :loading="submittingRx" :disabled="!rxItems.length || rxBlockIssues.length > 0"
-                @click="submitPrescription">开方</el-button>
+              <el-button type="primary" size="large" class="rx-submit-btn" :loading="submittingRx"
+                :disabled="!rxItems.length || rxBlockIssues.length > 0" @click="submitPrescription">
+                开方
+              </el-button>
             </div>
 
             <el-divider content-position="left">本次处方</el-divider>
@@ -398,6 +424,7 @@ import {
   aiAssist,
   checkPrescription,
   checkRecord,
+  commonTerms,
   createPrescription,
   fetchPrescriptionHtml,
   finishVisit,
@@ -407,10 +434,10 @@ import {
   getVisit,
   listDoctors,
   listPrescriptions,
-  pageDrugs,
   pageVisits,
   saveRecord,
   startVisit,
+  suggestDrugs,
   suggestTerms
 } from '@/api'
 import { openPrintWindow } from '@/utils/print'
@@ -427,9 +454,11 @@ import {
 } from '@/utils/format'
 
 /*
- * v4 临床辅助接口（契约见 docs/api-contract.md §22~§25）：
- * suggestTerms（联想）/ checkRecord（质控）/ aiAssist（AI 助写）/
- * getAiSettings（AI 设置）/ checkPrescription（处方安全审查），均由 @/api 提供。
+ * 临床辅助接口：
+ * v4（api-contract §22~§25）：suggestTerms（联想）、checkRecord（质控）、
+ *   aiAssist（AI 助写）、getAiSettings（AI 设置）、checkPrescription（处方安全审查）；
+ * v7（api-contract §29~§30）：suggestDrugs（药品首拼联想）、commonTerms（空输入框常见项）。
+ * 均由 @/api 提供。
  */
 
 const RX_STATUS_TAG = {
@@ -440,7 +469,7 @@ const RX_STATUS_TAG = {
 }
 
 const RECORD_TYPE_TEXT = { TCM: '中医病历', WESTERN: '西医病历' }
-const SOURCE_TEXT = { SYSTEM: '标准术语', HISTORY: '本院历史' }
+const SOURCE_TEXT = { SYSTEM: '标准术语', HISTORY: '本院常用' }
 const ISSUE_LEVEL_TEXT = { BLOCK: '必须补充', WARN: '建议完善', INFO: '提示' }
 const ISSUE_LEVEL_TAG = { BLOCK: 'danger', WARN: 'warning', INFO: 'info' }
 const ISSUE_SORT = { BLOCK: 0, WARN: 1, INFO: 2 }
@@ -476,55 +505,56 @@ const RECORD_FIELDS = [
 
 /*
  * 字段布局：
- * group  -> 分组标题（el-divider）
- * suggest-> 联想类别（SYMPTOM / TONGUE / PULSE / SYNDROME / TREATMENT / DIAGNOSIS）
- * ai     -> AI 助写字段名（presentIllness / treatmentPrinciple / advice / physicalExam）
- * required -> 必填项（与 docs/clinical-design.md 及后端 RecordQcService 对齐）
+ * group       -> 分组标题（el-divider）
+ * suggest     -> 联想类别（SYMPTOM / TONGUE / PULSE / SYNDROME / TREATMENT / DIAGNOSIS）
+ * focusCommon -> 光标进入空输入框时先给「常见项」（/tcm/common），否则按关键字联想
+ * ai          -> AI 助写字段名（presentIllness / treatmentPrinciple / advice / physicalExam）
+ * required    -> 必填项（与 docs/clinical-design.md 及后端 RecordQcService 对齐）
  */
 const FIELD_LAYOUT = {
   TCM: [
     { group: '主诉及病史' },
     {
       key: 'chiefComplaint', label: '主诉', required: true, span: 24, rows: 2, maxlength: 500,
-      suggest: 'SYMPTOM', placeholder: '主要症状 + 持续时间，如：反复胃脘胀痛 3 月'
+      suggest: 'SYMPTOM', focusCommon: true, placeholder: '主要症状 + 持续时间，如：反复胃脘胀痛 3 月'
     },
     {
-      key: 'presentIllness', label: '现病史', required: true, span: 12, rows: 4, maxlength: 1000,
+      key: 'presentIllness', label: '现病史', required: true, span: 12, rows: 3, maxlength: 1000,
       suggest: 'SYMPTOM', ai: 'presentIllness',
       placeholder: '发病诱因、症状演变、诊治经过、十问（寒热、汗、饮食、二便、睡眠）'
     },
     {
-      key: 'pastHistory', label: '既往史', required: true, span: 12, rows: 4, maxlength: 1000,
+      key: 'pastHistory', label: '既往史', required: true, span: 12, rows: 3, maxlength: 1000,
       placeholder: '既往疾病、手术、过敏史（无则写「无」）'
     },
     { group: '中医四诊' },
-    { key: 'inspection', label: '望诊', required: true, span: 12, rows: 3, placeholder: '神、色、形、态' },
-    { key: 'auscultation', label: '闻诊', span: 12, rows: 3, placeholder: '语声、气息、气味' },
-    { key: 'inquiry', label: '问诊', span: 12, rows: 3, placeholder: '寒热、汗、饮食、二便、睡眠' },
-    { key: 'palpation', label: '切诊', required: true, span: 12, rows: 3, placeholder: '按诊、肌肤、手足' },
+    { key: 'inspection', label: '望诊', required: true, span: 12, rows: 2, placeholder: '神、色、形、态' },
+    { key: 'auscultation', label: '闻诊', span: 12, rows: 2, placeholder: '语声、气息、气味' },
+    { key: 'inquiry', label: '问诊', span: 12, rows: 2, placeholder: '寒热、汗、饮食、二便、睡眠' },
+    { key: 'palpation', label: '切诊', required: true, span: 12, rows: 2, placeholder: '按诊、肌肤、手足' },
     {
       key: 'tongue', label: '舌象', required: true, span: 12, rows: 2, maxlength: 500,
-      suggest: 'TONGUE', placeholder: '舌质、舌苔，如：舌淡红、苔薄白'
+      suggest: 'TONGUE', focusCommon: true, placeholder: '舌质、舌苔，如：舌淡红、苔薄白'
     },
     {
       key: 'pulse', label: '脉象', required: true, span: 12, rows: 2, maxlength: 500,
-      suggest: 'PULSE', placeholder: '如：脉弦细'
+      suggest: 'PULSE', focusCommon: true, placeholder: '如：脉弦细'
     },
     { group: '辨证论治' },
     {
       key: 'tcmDisease', label: '中医病名', required: true, span: 12, rows: 2, maxlength: 200,
-      suggest: 'SYNDROME', placeholder: '如：胃痞、不寐'
+      suggest: 'SYNDROME', focusCommon: true, placeholder: '如：胃痞、不寐'
     },
     {
       key: 'syndrome', label: '证候诊断', required: true, span: 12, rows: 2, maxlength: 500,
-      suggest: 'SYNDROME', placeholder: '如：脾胃气虚证'
+      suggest: 'SYNDROME', focusCommon: true, placeholder: '如：脾胃气虚证'
     },
     {
-      key: 'treatmentPrinciple', label: '治则治法', required: true, span: 12, rows: 3, maxlength: 500,
-      suggest: 'TREATMENT', ai: 'treatmentPrinciple', placeholder: '如：健脾益气'
+      key: 'treatmentPrinciple', label: '治则治法', required: true, span: 12, rows: 2, maxlength: 500,
+      suggest: 'TREATMENT', focusCommon: true, ai: 'treatmentPrinciple', placeholder: '如：健脾益气'
     },
     {
-      key: 'advice', label: '医嘱', span: 12, rows: 3, maxlength: 1000,
+      key: 'advice', label: '医嘱', span: 12, rows: 2, maxlength: 1000,
       ai: 'advice', placeholder: '饮食起居、复诊安排等'
     }
   ],
@@ -532,10 +562,10 @@ const FIELD_LAYOUT = {
     { group: '主诉及病史' },
     {
       key: 'chiefComplaint', label: '主诉', required: true, span: 24, rows: 2, maxlength: 500,
-      suggest: 'SYMPTOM', placeholder: '主要症状 + 持续时间，如：咳嗽咳痰 1 周'
+      suggest: 'SYMPTOM', focusCommon: true, placeholder: '主要症状 + 持续时间，如：咳嗽咳痰 1 周'
     },
     {
-      key: 'presentIllness', label: '现病史', required: true, span: 24, rows: 4, maxlength: 1000,
+      key: 'presentIllness', label: '现病史', required: true, span: 24, rows: 3, maxlength: 1000,
       suggest: 'SYMPTOM', ai: 'presentIllness',
       placeholder: '发病诱因、症状演变、伴随症状、诊治经过'
     },
@@ -545,21 +575,21 @@ const FIELD_LAYOUT = {
     },
     { group: '查体与辅助检查' },
     {
-      key: 'physicalExam', label: '体格检查', required: true, span: 24, rows: 4, maxlength: 2000,
+      key: 'physicalExam', label: '体格检查', required: true, span: 24, rows: 3, maxlength: 2000,
       ai: 'physicalExam', placeholder: '生命体征（T/P/R/BP）+ 阳性与阴性体征'
     },
     {
-      key: 'auxiliaryExam', label: '辅助检查', span: 24, rows: 3, maxlength: 2000,
+      key: 'auxiliaryExam', label: '辅助检查', span: 24, rows: 2, maxlength: 2000,
       placeholder: '化验、影像等检查结果（无则写「无」或「暂缺」）'
     },
     { group: '诊断与处理' },
     {
       key: 'westernDiagnosis', label: '西医诊断', required: true, span: 16, rows: 2, maxlength: 500,
-      suggest: 'DIAGNOSIS', placeholder: '疾病名称，如：急性支气管炎'
+      suggest: 'DIAGNOSIS', focusCommon: true, placeholder: '疾病名称，如：急性支气管炎'
     },
     { key: 'icdCode', label: 'ICD-10 编码', span: 8, single: true, maxlength: 20, placeholder: '如：J20.900' },
     {
-      key: 'advice', label: '处理意见', required: true, span: 24, rows: 3, maxlength: 1000,
+      key: 'advice', label: '处理意见', required: true, span: 24, rows: 2, maxlength: 1000,
       ai: 'advice', placeholder: '用药、检查、随访安排'
     }
   ]
@@ -711,30 +741,59 @@ function clearSelection() {
 }
 
 /* ---------------- 联想输入 ---------------- */
-function makeSuggestFetcher(category) {
+const SUGGEST_CATEGORIES = ['SYMPTOM', 'TONGUE', 'PULSE', 'SYNDROME', 'TREATMENT', 'DIAGNOSIS']
+/* 空输入框「常见项」按类别缓存：同一类别只看一次，后续聚焦秒开 */
+const commonTermCache = new Map()
+
+function normalizeSuggestions(data) {
+  return (Array.isArray(data) ? data : []).filter((item) => item && item.term)
+}
+
+/**
+ * 联想数据源：
+ * - 关键字为空且字段支持 focusCommon -> /tcm/common（本院常用 + 标准术语，光标进入即出）
+ * - 有关键字 -> /tcm/suggest（按关键字/拼音码搜索）
+ * - 长文本（如整段现病史）不做联想，避免无意义的模糊查询
+ */
+function makeSuggestFetcher(category, withCommon) {
   return async (keyword, callback) => {
     const kw = String(keyword ?? '').trim()
-    if (!kw) {
-      callback([])
-      return
-    }
     try {
-      const data = await suggestTerms({ category, keyword: kw, limit: 10 })
-      const list = Array.isArray(data) ? data : []
-      callback(list.filter((item) => item && item.term))
+      if (!kw) {
+        if (!withCommon) {
+          callback([])
+          return
+        }
+        if (commonTermCache.has(category)) {
+          callback(commonTermCache.get(category))
+          return
+        }
+        const list = normalizeSuggestions(await commonTerms({ category, limit: 10 }))
+        commonTermCache.set(category, list)
+        callback(list)
+        return
+      }
+      if (kw.length > 40) {
+        callback([])
+        return
+      }
+      callback(normalizeSuggestions(await suggestTerms({ category, keyword: kw, limit: 10 })))
     } catch {
       callback([])
     }
   }
 }
 
-const suggestFetchers = {
-  SYMPTOM: makeSuggestFetcher('SYMPTOM'),
-  TONGUE: makeSuggestFetcher('TONGUE'),
-  PULSE: makeSuggestFetcher('PULSE'),
-  SYNDROME: makeSuggestFetcher('SYNDROME'),
-  TREATMENT: makeSuggestFetcher('TREATMENT'),
-  DIAGNOSIS: makeSuggestFetcher('DIAGNOSIS')
+const suggestFetchers = {}
+SUGGEST_CATEGORIES.forEach((category) => {
+  suggestFetchers[category] = makeSuggestFetcher(category, false)
+  suggestFetchers[`${category}:common`] = makeSuggestFetcher(category, true)
+})
+
+function suggestFetcherFor(field) {
+  if (!field?.suggest) return suggestFetchers.SYMPTOM
+  const key = field.focusCommon ? `${field.suggest}:common` : field.suggest
+  return suggestFetchers[key] || suggestFetchers[field.suggest]
 }
 
 /* ---------------- 实时质控 ---------------- */
@@ -934,6 +993,8 @@ async function saveRecordForm() {
     if (data?.version != null) recordVersion.value = data.version
     recordSavedSnapshot.value = formSnapshot()
     hasSavedRecord.value = true
+    // 新病历会进入本院历史，清掉常见项缓存，下次聚焦即可看到最新高频项
+    commonTermCache.clear()
     ElMessage.success(recordVersion.value != null ? `已保存（版本 ${recordVersion.value}）` : '病历已保存')
   } catch {
     /* 失败提示由 request 拦截器统一处理 */
@@ -1111,20 +1172,53 @@ function parseDoseNumber(text) {
   return match ? Number(match[0]) : null
 }
 
+let drugSearchSeq = 0
+
+function normalizeDrugOptions(data) {
+  return (Array.isArray(data) ? data : (data?.list || [])).filter((item) => item && item.id != null)
+}
+
+function drugOptionLabel(drug) {
+  return `${drug.name} · ${drug.spec || '无规格'} · ${drug.unit || '-'} · ￥${formatMoney(drug.price)}`
+}
+
+function formatStock(value) {
+  const num = Number(value ?? 0)
+  return Number.isFinite(num) ? String(num) : '-'
+}
+
+/* 库存状态：out 缺货 / low 低于预警值 / ok 正常 */
+function stockLevel(drug) {
+  const qty = Number(drug?.stockQty ?? 0)
+  if (!Number.isFinite(qty) || qty <= 0) return 'out'
+  const warn = drug?.stockWarn == null ? null : Number(drug.stockWarn)
+  if (warn != null && Number.isFinite(warn) && qty <= warn) return 'low'
+  return 'ok'
+}
+
+function stockText(drug) {
+  return stockLevel(drug) === 'out' ? '缺货' : `库存 ${formatStock(drug?.stockQty)}`
+}
+
+/* 药品联想（v7 §29）：名称 / 编码 / 拼音首字母（如 hq → 黄芪、黄芩），替代分页查询 */
 async function searchDrugs(keyword) {
+  const kw = String(keyword ?? '').trim()
+  const seq = ++drugSearchSeq
   drugSearchLoading.value = true
   try {
-    const data = await pageDrugs({ keyword: (keyword || '').trim() || undefined, page: 1, size: 20 })
-    drugOptions.value = data?.list || []
+    const data = await suggestDrugs({ keyword: kw || undefined, limit: 12 })
+    if (seq !== drugSearchSeq) return
+    drugOptions.value = normalizeDrugOptions(data)
   } catch {
+    if (seq !== drugSearchSeq) return
     drugOptions.value = []
   } finally {
-    drugSearchLoading.value = false
+    if (seq === drugSearchSeq) drugSearchLoading.value = false
   }
 }
 
 function onDrugSelectVisible(visible) {
-  if (visible && !drugOptions.value.length) searchDrugs('')
+  if (visible) searchDrugs('')
 }
 
 function onSelectDrug(drugId) {
@@ -1143,8 +1237,13 @@ function onSelectDrug(drugId) {
       price: drug.price,
       dose: '',
       quantity: 1,
-      usageText: ''
+      usageText: '',
+      needTrace: !!drug.needTrace,
+      stockQty: drug.stockQty
     })
+  }
+  if (stockLevel(drug) === 'out') {
+    ElMessage.warning(`「${drug.name}」当前库存为 0，开方前请与药房确认`)
   }
   selectedDrugId.value = null
 }
@@ -1397,11 +1496,15 @@ onBeforeUnmount(() => {
   width: 220px;
 }
 
+/* 三栏 Grid：候诊 220px | 病历自适应 | 处方占主导（min 460px，1.6fr） */
 .columns {
   flex: 1;
-  display: flex;
+  display: grid;
+  grid-template-columns: 220px minmax(320px, 1fr) minmax(460px, 1.6fr);
   gap: 12px;
   min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .page-card.queue-column,
@@ -1411,21 +1514,23 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-
-.queue-column {
-  flex: 0 0 280px;
-  width: 280px;
-}
-
-.record-column {
-  flex: 1;
   min-width: 0;
 }
 
+.queue-column,
+.record-column,
 .rx-column {
-  flex: 0 0 460px;
-  width: 460px;
+  min-width: 0;
+}
+
+/* 处方区视觉上更突出：淡蓝描边 + 轻投影 + 主色系表头 */
+.rx-column {
+  border: 1px solid #d9ecff;
+  box-shadow: 0 2px 12px rgba(64, 158, 255, 0.1);
+}
+
+.rx-column .column-header {
+  background: #f4f9ff;
 }
 
 .column-header {
@@ -1516,14 +1621,15 @@ onBeforeUnmount(() => {
 
 .queue-meta {
   display: flex;
-  gap: 10px;
-  margin-top: 6px;
-  font-size: 12px;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11px;
   color: #606266;
+  flex-wrap: wrap;
 }
 
 .queue-complaint {
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 12px;
   color: #909399;
   display: -webkit-box;
@@ -1536,16 +1642,21 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.queue-actions .text-muted {
+  font-size: 11px;
 }
 
 .patient-bar {
   background: #f5f7fa;
   border: 1px solid #ebeef5;
   border-radius: 6px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
 }
 
 .patient-main {
@@ -1574,8 +1685,13 @@ onBeforeUnmount(() => {
   color: #e6a23c;
 }
 
+/* 病历区更紧凑：小间距 + 两列网格（由 el-col span=12 控制） */
+.record-body {
+  padding: 8px 12px;
+}
+
 .record-form {
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .field-label {
@@ -1590,12 +1706,23 @@ onBeforeUnmount(() => {
   margin-left: 2px;
 }
 
+.record-form :deep(.el-form-item) {
+  margin-bottom: 6px;
+}
+
 .record-form :deep(.el-form-item__label) {
   display: flex;
   align-items: center;
   width: 100%;
   gap: 6px;
-  line-height: 24px;
+  line-height: 20px;
+  font-size: 12px;
+  padding-bottom: 2px;
+}
+
+.record-form :deep(.el-textarea__inner) {
+  padding: 4px 8px;
+  font-size: 13px;
 }
 
 .ai-btn {
@@ -1625,6 +1752,12 @@ onBeforeUnmount(() => {
 .suggest-pinyin {
   font-size: 12px;
   color: #909399;
+}
+
+.suggest-count {
+  font-size: 11px;
+  color: #e6a23c;
+  white-space: nowrap;
 }
 
 .qc-panel {
@@ -1674,7 +1807,8 @@ onBeforeUnmount(() => {
 }
 
 .rx-checking {
-  margin-right: 10px;
+  margin-bottom: 2px;
+  text-align: center;
 }
 
 .record-footer {
@@ -1685,15 +1819,105 @@ onBeforeUnmount(() => {
 }
 
 .rx-form {
-  margin-top: 4px;
+  margin-top: 0;
 }
 
-.pregnancy-hint {
-  margin-top: 4px;
-  line-height: 18px;
+.rx-body {
+  padding: 12px 16px;
+}
+
+/* 药品搜索置顶加粗（v7 首拼联想） */
+.drug-search-item :deep(.el-form-item__label) {
+  font-size: 14px;
+  font-weight: 700;
+  color: #303133;
+  padding-bottom: 4px;
+}
+
+.drug-search-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.drug-search-hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: #909399;
 }
 
 .drug-select {
+  width: 100%;
+}
+
+.drug-select :deep(.el-select__wrapper) {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 药品联想下拉项：名称 · 规格 · 单位 · 价格 + 库存 */
+.drug-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.drug-option-name {
+  font-weight: 600;
+  color: #303133;
+  flex-shrink: 0;
+}
+
+.drug-option-meta {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #606266;
+}
+
+.drug-option-stock {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.stock-out {
+  color: #f56c6c;
+  font-weight: 600;
+}
+
+.stock-low {
+  color: #e6a23c;
+}
+
+.stock-ok {
+  color: #909399;
+}
+
+/* 处方参数行（类型 / 剂数 / 煎法 / 妊娠）：横向压缩纵向空间 */
+.rx-settings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0 14px;
+}
+
+.rx-setting {
+  margin-bottom: 8px !important;
+}
+
+.rx-setting-doses {
+  width: 96px;
+}
+
+.rx-setting-decoction {
+  width: 130px;
+}
+
+.rx-setting-input {
   width: 100%;
 }
 
@@ -1713,25 +1937,62 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
+/* 合计金额大号显示 */
 .rx-total {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 2px;
+  padding: 10px 12px;
+  margin-top: 4px;
+  border-radius: 6px;
+  background: #f7f9fc;
+  border: 1px solid #ebeef5;
+}
+
+.rx-total-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   font-size: 13px;
+}
+
+.rx-total-count {
+  font-weight: 600;
+}
+
+.rx-total-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.rx-total-label {
+  font-size: 13px;
+  color: #606266;
 }
 
 .rx-amount {
   color: #f56c6c;
-  font-size: 16px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
 }
 
+/* 开方按钮全宽主色 */
 .rx-submit {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.rx-submit-btn {
+  width: 100%;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 2px;
 }
 
 .rx-list {
@@ -1764,7 +2025,7 @@ onBeforeUnmount(() => {
 }
 
 :deep(.el-divider--horizontal) {
-  margin: 14px 0 10px;
+  margin: 8px 0 6px;
 }
 
 :deep(.el-divider__text) {
@@ -1773,13 +2034,21 @@ onBeforeUnmount(() => {
 }
 
 :deep(.el-form-item) {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
-@media (max-width: 1360px) {
-  .rx-column {
-    flex: 0 0 400px;
-    width: 400px;
+/*
+ * 小屏（<1400px）：候诊队列进一步收窄，处方区固定 520px 不被挤压；
+ * 三栏总宽超出可视区时在 .columns 内横向滚动，而不是压缩处方
+ */
+@media (max-width: 1400px) {
+  .columns {
+    grid-template-columns: 180px minmax(300px, 1fr) 520px;
+    overflow-x: auto;
+  }
+
+  .queue-card {
+    padding: 8px;
   }
 }
 </style>

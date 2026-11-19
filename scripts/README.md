@@ -75,3 +75,9 @@ powershell -ExecutionPolicy Bypass -File scripts\build-portable.ps1 -Zip
 | 脚本 | 用途 |
 | --- | --- |
 | `smoke-v6.mjs` | 扫码发药冒烟（9 项）：饮片按量扣库存、扫完自动完成、旧发药接口受保护、需追溯品种拦截条码、追溯码逐件核销、直接出库 |
+
+## v7 新增脚本
+
+| 脚本 | 用途 |
+| --- | --- |
+| `smoke-v7.mjs` | 开方效率冒烟（9 项）：拼音首字母/中文/编码搜药、联想字段、limit、常见证型与主诉、历史高频优先 |

@@ -36,6 +36,14 @@ public class TcmAssistController {
         return ApiResponse.ok(termService.suggest(category, keyword, limit));
     }
 
+    /** 常见项：光标进入空输入框时展示（历史高频 + 标准术语）。 */
+    @GetMapping("/common")
+    public ApiResponse<List<QcResult.Suggestion>> common(
+            @RequestParam TermCategory category,
+            @RequestParam(defaultValue = "10") int limit) {
+        return ApiResponse.ok(termService.common(category, limit));
+    }
+
     @PostMapping("/qc")
     public ApiResponse<QcResult> qc(@RequestBody MedicalRecordRequest request) {
         return ApiResponse.ok(qcService.check(request));

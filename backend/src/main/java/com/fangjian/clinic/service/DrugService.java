@@ -32,6 +32,14 @@ public class DrugService {
         return PageResult.of(result, this::toDto);
     }
 
+    /** 药品联想：名称/编码/拼音首字母模糊匹配，供开方快速录药。 */
+    public java.util.List<DrugDto> suggest(String keyword, int limit) {
+        String kw = keyword == null ? "" : keyword.trim();
+        int size = Math.max(1, Math.min(limit, 30));
+        return drugRepository.suggest(kw, org.springframework.data.domain.PageRequest.of(0, size))
+                .stream().map(this::toDto).toList();
+    }
+
     public DrugDto get(Long id) {
         return toDto(find(id));
     }

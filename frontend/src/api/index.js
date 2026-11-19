@@ -162,3 +162,7 @@ export const executeImport = (type, file, mode) => {
 export const pharmacyScan = (data) => request.post('/pharmacy/scan', data)
 export const scanProgress = (prescriptionId) => request.get(`/pharmacy/scan/progress/${prescriptionId}`)
 export const pharmacyScanOut = (data) => request.post('/pharmacy/scan-out', data)
+
+/* ---------------- 开方效率（v7） ---------------- */
+export const suggestDrugs = (params) => request.get('/drugs/suggest', { params })
+export const commonTerms = (params) => request.get('/tcm/common', { params })
